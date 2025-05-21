@@ -1,0 +1,116 @@
+<odoo>
+    <record id="view_reclamation_form" model="ir.ui.view">
+        <field name="name">reclamation.form</field>
+        <field name="model">reclamation</field>
+        <field name="arch" type="xml">
+            <form string="Réclamation">
+                <header>
+                    <field name="state" widget="statusbar"/>
+                    <button name="action_analyse" type="object" string="Passer à Analyse" class="btn-info"
+                            invisible="state != 'en_cours'"/>
+                    <button name="action_prise_en_charge" type="object" string="Prise en charge" class="btn-secondary"
+                            invisible="state != 'draft'"/>
+                    <button name="action_en_cours" type="object" string="En cours" class="btn-primary"
+                            invisible="state != 'prise_en_charge'"/>
+                    <button name="action_traiter" type="object" string="Traiter" class="btn-primary"
+                            invisible="state != 'analyse'"/>
+                    <button name="action_annule" type="object" string="Annuler" class="btn-danger"/>
+                    <button name="action_remettre_brouillon" type="object" string="Remettre en brouillon"
+                            class="btn-warning"/>
+                    <button name="action_generer_fnc"
+                            type="object"
+                            string="Générer Fiche Non-Conformité"
+                            class="btn-primary"
+                            invisible="state != 'prise_en_charge'"/>
+                    <button name="action_cloturer" type="object" string="Clôturer" class="btn btn-danger"
+                            invisible="state != 'traitee'"/>
+                </header>
+                <sheet>
+                    <group col="2">  <!-- Division en deux colonnes -->
+                        <!-- Colonne 1 -->
+                        <group>
+                            <field name="name" readonly="1"/>
+                            <field name="date_reclamation"/>
+                            <field name="fournisseur_id"/>
+                            <field name="description"/>
+
+                            <field name="date_cloture"
+                                   invisible="state != 'cloturee' "
+                            />
+                            <field name="responsable_traitement_id"/>
+
+                        </group>
+                        <group>
+                            <field name="type_reclamation"/>
+                            <field name="gravite"/>
+                            <field name="designation"/>
+                            <field name="decision"/>
+                            <field name="plan_action_declenche"/>
+                            <field name="plan_action_joint" filename="plan_action_filename"/>
+                            <field name="cout_reclamation"/>
+                            <field name="feedback_client"/>
+
+
+                        </group>
+                    </group>
+                    <footer>
+                        <button name="compute_can_cloturer"
+                                string="Clôturer"
+                                type="object"
+                                class="btn btn-danger"
+                                invisible="[(1, '=', 1), ('can_cloturer', '=', False)]"/>
+                    </footer>
+                    <notebook>
+                        <page string="Suivi de Réclamation">
+                            <field name="suivi_ids">
+                                <tree editable="bottom">
+                                    <field name="responsable_suivi"/>
+                                    <field name="delai_fixe"/>
+                                    <field name="rapport_suivi"/>
+                                    <field name="date_cloture" readonly="1"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Vue Liste -->
+    <record id="view_reclamation_tree" model="ir.ui.view">
+        <field name="name">reclamation.tree</field>
+        <field name="model">reclamation</field>
+        <field name="arch" type="xml">
+            <tree string="Reclamation"
+                  decoration-info="state == 'draft'"
+                  decoration-success="state == 'analyse'"
+                  decoration-warning="state == 'prise_en_charge'"
+                  decoration-primary="state == 'en_cours'"
+                  decoration-danger="state == 'cloturee'"
+                  decoration-muted="state == 'annule'">
+                <field name="name" readonly="1"/>
+                <field name="date_reclamation"/>
+                <field name="fournisseur_id"/>
+                <field name="description"/>
+                <field name="type_reclamation"/>
+                <field name="gravite"/>
+                <field name="state"/>
+                <field name="designation"/>
+                <field name="attachment" filename="attachment_name"/>
+                <field name="actions"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="reclamation_action" model="ir.actions.act_window">
+        <field name="name">reclamation</field>
+        <field name="res_model">reclamation</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem id="menu_reclamation_root" name="Réclamation" sequence="30"/>
+    <menuitem id="menu_reclamation" name="Gestion des Réclamation" parent="menu_reclamation_root"
+              action="reclamation_action" sequence="10"/>
+
+</odoo>

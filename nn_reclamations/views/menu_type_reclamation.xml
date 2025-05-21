@@ -1,0 +1,46 @@
+<odoo>
+    <!-- Vue formulaire pour les types de réclamation -->
+    <record id="view_type_reclamation_form" model="ir.ui.view">
+        <field name="name">type.reclamation.form</field>
+        <field name="model">type.reclamation</field>
+        <field name="arch" type="xml">
+            <form string="Type de Réclamation">
+                <sheet>
+                    <group>
+                        <field name="name" string="Nom du Type de Réclamation"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Vue Arbre pour l'affichage des types de réclamation -->
+    <record id="view_type_reclamation_tree" model="ir.ui.view">
+        <field name="name">type.reclamation.tree</field>
+        <field name="model">type.reclamation</field>
+        <field name="arch" type="xml">
+            <tree string="Types de Réclamation">
+                <field name="name" string="Nom du Type de Réclamation"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Action pour accéder à la gestion des types de réclamation -->
+    <record id="action_type_reclamation" model="ir.actions.act_window">
+        <field name="name">Types de Réclamation</field>
+        <field name="res_model">type.reclamation</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <!-- Menu pour accéder à la gestion des types de réclamation -->
+    <menuitem id="menu_reclamation_root" name="Réclamation" sequence="30"/>
+    <menuitem id="menu_reclamation_configuration"
+              name="Configuration"
+              parent="menu_reclamation_root"
+              sequence="20"/>
+    <menuitem id="menu_type_reclamation"
+              name="Types de Réclamation"
+              parent="menu_reclamation_configuration"
+              action="action_type_reclamation"
+              sequence="10"/>
+</odoo>

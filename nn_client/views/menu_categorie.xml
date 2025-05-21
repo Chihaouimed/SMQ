@@ -1,0 +1,40 @@
+<odoo>
+    <!-- Vues pour Catégorie -->
+    <record id="view_categorie_form" model="ir.ui.view">
+        <field name="name">categorie.form</field>
+        <field name="model">categorie</field>
+        <field name="arch" type="xml">
+            <form string="Catégorie">
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_categorie_tree" model="ir.ui.view">
+        <field name="name">categorie.tree</field>
+        <field name="model">categorie</field>
+        <field name="arch" type="xml">
+            <tree string="Catégories">
+                <field name="name"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Action pour Catégories -->
+    <record id="action_categorie" model="ir.actions.act_window">
+        <field name="name">Catégories</field>
+        <field name="res_model">categorie</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+
+    <menuitem id="menu_categorie"
+              name="Catégories"
+              parent="menu_client_config"
+              action="action_categorie"/>
+
+</odoo>

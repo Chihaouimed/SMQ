@@ -1,0 +1,33 @@
+<odoo>
+    <!-- Actions -->
+    <record id="action_audit" model="ir.actions.act_window">
+        <field name="name">Audits</field>
+        <field name="res_model">audit.audit</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Créer votre premier audit
+            </p>
+            <p>
+                Gérez vos audits et suivez leur progression.
+            </p>
+        </field>
+    </record>
+
+    <record id="action_audit_plan" model="ir.actions.act_window">
+        <field name="name">Plans d'audit</field>
+        <field name="res_model">audit.plan</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <!-- Menu principal -->
+    <menuitem id="menu_audit_root" name="Audit" sequence="50"/>
+
+    <!-- Sous-menus -->
+    <menuitem id="menu_audit_main" name="Audits" parent="menu_audit_root" sequence="10"/>
+    <menuitem id="menu_audit_list" name="Tous les audits" parent="menu_audit_main" action="action_audit" sequence="1"/>
+    <menuitem id="menu_audit_plan_list" name="Plans d'audit" parent="menu_audit_main" action="action_audit_plan" sequence="2"/>
+
+    <!-- Menu de configuration -->
+    <menuitem id="menu_audit_config" name="Configuration" parent="menu_audit_root" sequence="100"/>
+</odoo>

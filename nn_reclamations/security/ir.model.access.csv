@@ -1,0 +1,8 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_reclamation,access_reclamation,model_reclamation,,1,1,1,1
+access_type_reclamation,Access to Type Reclamation,model_type_reclamation,,1,1,1,1
+access_reclamation_suivi,reclamation.suivi,model_reclamation_suivi,,1,1,1,1
+
+
+
+

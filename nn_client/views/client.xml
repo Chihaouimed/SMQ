@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Modification de la vue du formulaire des partenaires -->
+    <record id="view_partner_form_inherit_client" model="ir.ui.view">
+        <field name="name">res.partner.form.client</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+
+
+            <xpath expr="//field[@name='website']" position="after">
+                <field name="raison_sociale"/>
+                <field name="code"/>
+                <field name="activite"/>
+                <field name="type_client"/>
+                <field name="categorie"/>
+                <field name="date"/>
+            </xpath>
+        </field>
+    </record>
+    <!-- Ajout du Smart Button "Documents" -->
+    <record id="view_partner_form_inherit_client_documents" model="ir.ui.view">
+        <field name="name">res.partner.form.client.documents</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@class='oe_button_box']" position="inside">
+                <button name="action_view_documents"
+                        type="object"
+                        icon="fa-folder-open"
+                        string="Documents"
+                        class="oe_stat_button">
+                    <field name="document_count" widget="statinfo"/>
+                </button>
+            </xpath>
+        </field>
+    </record>
+    <record id="view_partner_form_inherit_client_attachments" model="ir.ui.view">
+        <field name="name">res.partner.form.client.attachments</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@class='oe_button_box']" position="inside">
+                <button name="action_view_attachments"
+                        type="object"
+                        icon="fa-paperclip"
+                        string="Pièces jointes"
+                        class="oe_stat_button">
+                    <field name="attachment_count" widget="statinfo"/>
+                </button>
+            </xpath>
+        </field>
+    </record>
+    <!-- Action pour afficher uniquement client -->
+    <record id="client_action" model="ir.actions.act_window">
+        <field name="name">Client</field>
+        <field name="res_model">res.partner</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <!-- Menu client -->
+    <menuitem id="menu_client_root" name="Client" sequence="10"/>
+    <menuitem id="menu_client" name="Gestion des clients" parent="menu_client_root"
+              action="client_action" sequence="10"/>
+
+
+</odoo>

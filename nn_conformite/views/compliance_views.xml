@@ -1,0 +1,147 @@
+<odoo>
+    <!-- Vue formulaire pour les fiches de conformité -->
+    <record id="view_compliance_sheet_form" model="ir.ui.view">
+        <field name="name">compliance.sheet.form</field>
+        <field name="model">compliance.sheet</field>
+        <field name="arch" type="xml">
+            <form string="Fiche de conformité">
+                <header>
+                    <button name="action_set_in_progress" string="En cours" type="object" invisible="state != 'draft'" class="oe_highlight"/>
+                    <button name="action_set_compliant" string="Marquer conforme" type="object" invisible="state not in ('draft', 'in_progress', 'non_compliant')" class="oe_highlight"/>
+                    <button name="action_set_non_compliant" string="Marquer non conforme" type="object" invisible="state not in ('draft', 'in_progress', 'compliant')"/>
+                    <button name="action_set_draft" string="Remettre en brouillon" type="object" invisible="state not in ('in_progress', 'compliant', 'non_compliant')" groups="base.group_system"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,in_progress,compliant,non_compliant"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="Référence"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="compliance_type_id"/>
+                            <field name="regulation_name"/>
+                            <field name="is_applicable"/>
+                        </group>
+                        <group>
+                            <field name="source"/>
+                            <field name="create_date"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Plan d'action" name="action_plan">
+                            <field name="action_plan" placeholder="Détailler ici les actions à entreprendre pour la mise en conformité..."/>
+                        </page>
+                        <page string="Pièces jointes" name="attachments">
+                            <field name="attachment_ids" widget="many2many_binary"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- Vue liste pour les fiches de conformité -->
+    <record id="view_compliance_sheet_tree" model="ir.ui.view">
+        <field name="name">compliance.sheet.tree</field>
+        <field name="model">compliance.sheet</field>
+        <field name="arch" type="xml">
+            <tree string="Fiches de conformité" decoration-info="state=='draft'" decoration-warning="state=='in_progress'" decoration-success="state=='compliant'" decoration-danger="state=='non_compliant'">
+                <field name="name"/>
+                <field name="compliance_type_id"/>
+                <field name="regulation_name"/>
+                <field name="source"/>
+                <field name="is_applicable"/>
+                <field name="create_date"/>
+                <field name="state"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Vue de recherche pour les fiches de conformité -->
+    <record id="view_compliance_sheet_search" model="ir.ui.view">
+        <field name="name">compliance.sheet.search</field>
+        <field name="model">compliance.sheet</field>
+        <field name="arch" type="xml">
+            <search string="Rechercher des fiches de conformité">
+                <field name="name"/>
+                <field name="regulation_name"/>
+                <field name="source"/>
+                <field name="compliance_type_id"/>
+                <filter string="Applicable" name="is_applicable" domain="[('is_applicable', '=', True)]"/>
+                <filter string="Non applicable" name="not_applicable" domain="[('is_applicable', '=', False)]"/>
+                <separator/>
+                <filter string="Brouillon" name="draft" domain="[('state', '=', 'draft')]"/>
+                <filter string="En cours" name="in_progress" domain="[('state', '=', 'in_progress')]"/>
+                <filter string="Conforme" name="compliant" domain="[('state', '=', 'compliant')]"/>
+                <filter string="Non conforme" name="non_compliant" domain="[('state', '=', 'non_compliant')]"/>
+                <group expand="0" string="Regrouper par">
+                    <filter string="Type" name="group_by_type" context="{'group_by': 'compliance_type_id'}"/>
+                    <filter string="État" name="group_by_state" context="{'group_by': 'state'}"/>
+                    <filter string="Mois de création" name="group_by_month" context="{'group_by': 'create_date:month'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Vue formulaire pour les types de conformité -->
+    <record id="view_compliance_type_form" model="ir.ui.view">
+        <field name="name">compliance.type.form</field>
+        <field name="model">compliance.type</field>
+        <field name="arch" type="xml">
+            <form string="Type de conformité">
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="active"/>
+                    </group>
+                    <group>
+                        <field name="description"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Vue liste pour les types de conformité -->
+    <record id="view_compliance_type_tree" model="ir.ui.view">
+        <field name="name">compliance.type.tree</field>
+        <field name="model">compliance.type</field>
+        <field name="arch" type="xml">
+            <tree string="Types de conformité">
+                <field name="name"/>
+                <field name="active"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Actions -->
+    <record id="action_compliance_sheet" model="ir.actions.act_window">
+        <field name="name">Fiches de conformité</field>
+        <field name="res_model">compliance.sheet</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_compliance_sheet_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Créer votre première fiche de conformité
+            </p>
+        </field>
+    </record>
+
+    <record id="action_compliance_type" model="ir.actions.act_window">
+        <field name="name">Types de conformité</field>
+        <field name="res_model">compliance.type</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Créer votre premier type de conformité
+            </p>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,56 @@
+<odoo>
+    <!-- Définir l'action avant de l'utiliser dans le menu -->
+    <record id="action_enquete_satisfaction_form" model="ir.actions.act_window">
+        <field name="name">Formulaire Enquête de Satisfaction</field>
+        <field name="res_model">enquete.satisfaction</field>
+        <field name="view_mode">form</field>
+        <field name="target">current</field>
+    </record>
+
+    <!-- Vue de formulaire pour l'enquête de satisfaction -->
+    <record id="view_enquete_satisfaction_form" model="ir.ui.view">
+        <field name="name">enquete.satisfaction.form</field>
+        <field name="model">enquete.satisfaction</field>
+        <field name="arch" type="xml">
+            <form string="Enquête de Satisfaction">
+                <header>
+                    <button name="action_send_emails" type="object" string="Envoyer un mail"/>
+
+                </header>
+                <sheet>
+
+                    <group>
+                        <field name="reference"/>
+                        <field name="date_debut"/>
+                        <field name="date_fin"/>
+                        <field name="type_questionnaire"/>
+                        <field name="survey_id"/>
+                        <field name="client_ids" widget="Many2many_tags"/>
+                    </group>
+
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Menu principal "Enquêtes de Satisfaction" -->
+    <menuitem id="menu_enquete_satisfaction" name="Enquêtes de Satisfaction" sequence="10"/>
+    <record id="enquete_satisfaction_action" model="ir.actions.act_window">
+        <field name="name">Enquêtes de Satisfaction</field>
+        <field name="res_model">enquete.satisfaction</field>
+        <field name="view_mode">tree,form,pivot,graph</field>
+        <!-- Décommente la ligne ci-dessous si tu as défini une vue de recherche spécifique -->
+        <!-- <field name="search_view_id" ref="module_name.view_enquete_satisfaction_search"/> -->
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Lancez votre première enquête de satisfaction !
+            </p>
+            <p>
+                Les enquêtes de satisfaction vous permettent de recueillir des retours clients pour améliorer vos
+                produits
+                et services.
+            </p>
+        </field>
+    </record>
+</odoo>
+

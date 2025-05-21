@@ -1,0 +1,4 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_fiche_risque,access_fiche_risque,model_fiche_risque,,1,1,1,1
+access_fiche_risque_critere,access_fiche_risque_critere,model_fiche_risque_critere,,1,1,1,1
+access_recommandation_ia_wizard,recommandation.ia.wizard,model_recommandation_ia_wizard,,1,1,1,0

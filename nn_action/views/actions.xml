@@ -1,0 +1,172 @@
+<odoo>
+    <!-- Form View -->
+    <record id="view_action_model_form" model="ir.ui.view">
+        <field name="name">action.form</field>
+        <field name="model">action</field>
+        <field name="arch" type="xml">
+            <form string="Action">
+                <header>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,en_attente,en_cours,bloque,termine,cancel"/>
+
+                    <button name="action_set_en_attente" string="En Attente" type="object" class="oe_highlight"
+                            invisible="state != 'draft'"/>
+
+                    <button name="action_set_en_cours" string="En Cours" type="object" class="oe_highlight"
+                            invisible="state != 'en_attente'"/>
+
+                    <button name="action_set_bloque" string="Bloqué" type="object"
+                            invisible="state != 'en_cours'"/>
+
+                    <button name="action_set_termine" string="Terminé" type="object"
+                            invisible="state != 'en_cours'"/>
+
+                    <button name="action_set_cancel" string="Annuler" type="object"
+                            invisible="state != 'en_cours'"/>
+
+                    <button name="action_set_draft" string="Réinitialiser" type="object"
+                            invisible="state == 'draft'"/>
+                </header>
+
+                <sheet>
+                    <group col="2">
+                        <!-- Colonne 1 -->
+                        <group>
+                            <field name="name"/>
+                            <field name="numero_sequentiel" readonly="1"/>
+                            <field name="designation"/>
+                            <field name="description"/>
+                            <field name="type_action"/>
+                            <field name="source_action"/>
+                            <field name="date_cloture" invisible="state != 'termine'"/>
+                        </group>
+
+                        <!-- Colonne 2 -->
+                        <group>
+                            <field name="cause_action"/>
+                            <field name="gravite_action"/>
+                            <field name="priorite_action"/>
+                            <field name="site"/>
+                            <field name="responsable_validation"/>
+                        </group>
+                    </group>
+
+                    <!-- Notebook for Sous-actions -->
+                    <notebook>
+                        <page string="Sous-actions">
+                            <field name="sous_action_ids">
+                                <tree editable="bottom">
+                                    <field name="numero_sequentiel"/>
+                                    <field name="responsable_realisation"/>
+                                    <field name="delai_realisation"/>
+                                    <field name="responsable_suivi"/>
+                                    <field name="delai_suivi"/>
+                                    <field name="gravite"/>
+                                    <field name="priorite"/>
+                                    <field name="piece_jointe"/>
+                                    <field name="taux_realisation"/>
+                                    <field name="depenses"/>
+                                    <field name="commentaire"/>
+                                </tree>
+                            </field>
+                        </page>
+
+
+                        <!-- Notebook for Clôtures -->
+
+                        <page string="Clôtures">
+                            <div>
+                                <field name="responsible_id" class="oe_inline"/>
+                                <button name="action_assign_responsible"
+                                        string="Assigner"
+                                        type="object"
+                                        class="oe_inline oe_link"
+                                        invisible="'state', '=', 'cloturee'"
+                                        icon="fa-user-plus"/>
+                            </div>
+                            <group>
+                                <field name="responsible_id"/>
+                                <field name="closure_deadline"/>
+                                <field name="action_effectiveness"/>
+                                <field name="closure_attachment"/>
+                                <field name="closure_comment"/>
+                            </group>
+                        </page>
+                        <page string="Notifications et états">
+                            <group>
+                                <field name="state"/>
+                                <field name="alert_responsible"/>
+                                <field name="personnes_concernees_ids" widget="many2many_tags"/>
+                                <div>
+                                    <field name="validation_responsible_id" class="oe_inline"/>
+                                </div>
+                                <div>
+                                    <field name="closure_responsible_id" class="oe_inline"/>
+                                </div>
+                            </group>
+                            <group string="Historique des modifications">
+                                <field name="modification_history_ids" widget="one2many_list" readonly="1">
+                                    <tree>
+                                        <field name="user_id"/>
+                                        <field name="old_state"/>
+                                        <field name="new_state"/>
+                                        <field name="change_date"/>
+                                    </tree>
+                                </field>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Tree View -->
+    <record id="view_action_model_tree" model="ir.ui.view">
+        <field name="name">action.tree</field>
+        <field name="model">action</field>
+        <field name="arch" type="xml">
+            <tree string="Action List"
+                  decoration-info="state == 'draft'"
+                  decoration-warning="state == 'en_attente'"
+                  decoration-primary="state == 'en_cours'"
+                  decoration-danger="state == 'bloque'"
+                  decoration-success="state == 'termine'"
+                  decoration-muted="state == 'cancel'">
+                <field name="name"/>
+                <field name="numero_sequentiel"/>
+                <field name="state"/>
+                <field name="designation"/>
+                <field name="taux_realisation"/>
+                <field name="depenses"/>
+                <field name="commentaire"/>
+                <field name="type_action"/>
+                <field name="source_action"/>
+                <field name="gravite_action"/>
+                <field name="priorite_action"/>
+                <field name="responsable_validation"/>
+                <field name="site"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Action for the View -->
+    <record id="action_action_model" model="ir.actions.act_window">
+        <field name="name">Actions</field>
+        <field name="res_model">action</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Créez votre première action ici.
+            </p>
+        </field>
+    </record>
+
+
+    <menuitem id="menu_action_root" name="Action" sequence="10"/>
+    <menuitem id="menu_action_model" name="Actions" parent="menu_action_root" action="action_action_model"
+              sequence="10"/>
+
+</odoo>
+
+

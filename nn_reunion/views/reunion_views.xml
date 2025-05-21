@@ -1,0 +1,193 @@
+<odoo>
+    <!-- Séquence pour la numérotation automatique des réunions -->
+    <data noupdate="1">
+        <record id="seq_reunion" model="ir.sequence">
+            <field name="name">Séquence Réunion</field>
+            <field name="code">reunion.reunion</field>
+            <field name="prefix">REU/</field>
+            <field name="padding">5</field>
+            <field name="company_id" eval="False"/>
+        </record>
+    </data>
+
+    <!-- Vue formulaire -->
+    <record id="view_reunion_form" model="ir.ui.view">
+        <field name="name">reunion.reunion.form</field>
+        <field name="model">reunion.reunion</field>
+        <field name="arch" type="xml">
+            <form string="Réunion">
+                <header>
+                    <button name="action_confirmer" string="Confirmer" type="object" class="oe_highlight"
+                            invisible="state!= 'brouillon'"/>
+
+                    <button name="action_annuler" string="Annuler" type="object"
+                            invisible="state in ('annule','termine' )"/>
+
+
+                    <button name="action_terminer" string="Terminer" type="object" class="oe_highlight"
+                            invisible="state != 'confirme'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="brouillon,confirme,termine"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="demandeur_id"/>
+                            <field name="date_reunion"/>
+                            <field name="type_reunion"/>
+                            <field name="lieu_reunion"/>
+                            <field name="duree_estimee" widget="float_time"/>
+                        </group>
+                        <group>
+                            <field name="participant_ids" widget="many2many_tags"/>
+                            <field name="piece_jointe" filename="piece_jointe_filename"/>
+                            <field name="piece_jointe_filename" invisible="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Ordre du jour">
+                            <field name="ordre_jour"/>
+                        </page>
+                        <page string="Commentaires">
+                            <field name="commentaire"/>
+                        </page>
+                        <page string="Compte rendu" invisible="state != 'termine' ">
+                            <field name="compte_rendu"/>
+
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="activity_ids" widget="mail_activity"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- Vue liste -->
+    <record id="view_reunion_tree" model="ir.ui.view">
+        <field name="name">reunion.reunion.tree</field>
+        <field name="model">reunion.reunion</field>
+        <field name="arch" type="xml">
+            <tree string="Réunions" decoration-info="state == 'brouillon'" decoration-success="state == 'confirme'"
+                  decoration-muted="state == 'annule'" decoration-bf="state == 'termine'">
+                <field name="name"/>
+                <field name="demandeur_id"/>
+                <field name="date_reunion"/>
+                <field name="type_reunion"/>
+                <field name="lieu_reunion"/>
+                <field name="duree_estimee" widget="float_time" sum="Durée totale"/>
+                <field name="state"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Vue calendrier -->
+    <record id="view_reunion_calendar" model="ir.ui.view">
+        <field name="name">reunion.reunion.calendar</field>
+        <field name="model">reunion.reunion</field>
+        <field name="arch" type="xml">
+            <calendar string="Réunions" date_start="date_reunion" color="demandeur_id">
+                <field name="name"/>
+                <field name="lieu_reunion"/>
+                <field name="type_reunion"/>
+            </calendar>
+        </field>
+    </record>
+
+
+    <!-- Vue recherche -->
+    <record id="view_reunion_search" model="ir.ui.view">
+        <field name="name">reunion.reunion.search</field>
+        <field name="model">reunion.reunion</field>
+        <field name="arch" type="xml">
+            <search string="Rechercher des réunions">
+                <field name="name"/>
+                <field name="demandeur_id"/>
+                <field name="lieu_reunion"/>
+                <field name="type_reunion"/>
+                <field name="participant_ids"/>
+                <filter string="Mes réunions" name="my_reunions" domain="[('demandeur_id.user_id', '=', uid)]"/>
+                <filter string="Réunions à venir" name="upcoming"
+                        domain="[('date_reunion', '>=', context_today().strftime('%Y-%m-%d'))]"/>
+                <separator/>
+                <filter string="Brouillon" name="draft" domain="[('state', '=', 'brouillon')]"/>
+                <filter string="Confirmée" name="confirmed" domain="[('state', '=', 'confirme')]"/>
+                <filter string="Terminée" name="done" domain="[('state', '=', 'termine')]"/>
+                <filter string="Annulée" name="canceled" domain="[('state', '=', 'annule')]"/>
+                <group expand="0" string="Regrouper par">
+                    <filter string="Demandeur" name="demandeur" context="{'group_by': 'demandeur_id'}"/>
+                    <filter string="Type" name="type" context="{'group_by': 'type_reunion'}"/>
+                    <filter string="État" name="status" context="{'group_by': 'state'}"/>
+                    <filter string="Date" name="date" context="{'group_by': 'date_reunion'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action pour ouvrir les réunions -->
+    <record id="action_reunion" model="ir.actions.act_window">
+        <field name="name">Réunions</field>
+        <field name="res_model">reunion.reunion</field>
+        <field name="view_mode">tree,form,calendar</field>
+        <field name="search_view_id" ref="view_reunion_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Créer votre première réunion
+            </p>
+            <p>
+                Gérer et organisez vos réunions: planification, participants, ordre du jour, etc.
+            </p>
+        </field>
+    </record>
+    <!-- Vue Pivot pour les Réunions -->
+    <record id="view_reunion_pivot" model="ir.ui.view">
+        <field name="name">Reunion Pivot View</field>
+        <field name="model">reunion.reunion</field>
+        <field name="arch" type="xml">
+            <pivot string="Réunions">
+                <field name="type_reunion" type="row"/>
+                <field name="state" type="column"/>
+                <field name="date_reunion" type="measure"/>
+                <field name="duree_estimee" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <!-- Vue Graphique pour les Réunions -->
+    <record id="view_reunion_graph" model="ir.ui.view">
+        <field name="name">Reunion Graph View</field>
+        <field name="model">reunion.reunion</field>
+        <field name="arch" type="xml">
+            <graph string="Réunions">
+                <field name="type_reunion" type="col"/>
+                <field name="date_reunion" type="row"/>
+                <field name="duree_estimee" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <!-- Action pour afficher les vues Pivot et Graphique -->
+    <record id="action_reunion_report" model="ir.actions.act_window">
+        <field name="name">Rapport des Réunions</field>
+        <field name="res_model">reunion.reunion</field>
+        <field name="view_mode">pivot,graph</field>
+        <field name="views" eval="[(4, ref('view_reunion_pivot')), (4, ref('view_reunion_graph'))]"/>
+        <field name="context">{}</field>
+    </record>
+
+
+    <!-- Structure du menu -->
+    <menuitem id="menu_reunion_root" name="Réunions" sequence="10" web_icon="reunion,static/description/icon.png"/>
+
+    <menuitem id="menu_reunion_all" name="Toutes les réunions" parent="menu_reunion_root" action="action_reunion"
+              sequence="10"/>
+
+    <menuitem id="menu_reunion_config" name="Configuration" parent="menu_reunion_root" sequence="100"/>
+</odoo>

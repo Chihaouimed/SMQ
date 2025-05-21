@@ -1,0 +1,9 @@
+<odoo>
+    <record id="seq_enquete_satisfaction" model="ir.sequence">
+        <field name="name">Enquête Satisfaction</field>
+        <field name="code">enquete.satisfaction</field>
+        <field name="prefix">ENQ-</field>
+        <field name="padding">4</field>
+        <field name="company_id" eval="False"/>
+    </record>
+</odoo>

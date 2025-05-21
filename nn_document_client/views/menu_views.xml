@@ -1,0 +1,26 @@
+<odoo>
+    <!-- Menu principal -->
+    <menuitem id="menu_document_client_root"
+              name="Documents Client"
+              sequence="10"/>
+
+    <!-- Menu principal pour les documents clients (si vous en avez besoin comme parent séparé) -->
+    <menuitem id="menu_client_documents_root"
+              name="Gestion Client"
+              parent="menu_document_client_root"
+              sequence="20"/>
+
+    <!-- Sous-menu pour les documents -->
+    <menuitem id="menu_document_client"
+              name="Documents"
+              parent="menu_document_client_root"
+              action="client_documentation_action"
+              sequence="1"/>
+
+    <!-- Sous-menu pour la gestion des documents client -->
+    <menuitem id="menu_client_documents"
+              name="Gestion Documents Client"
+              parent="menu_client_documents_root"
+              action="client_documentation_action"
+              sequence="10"/>
+</odoo>

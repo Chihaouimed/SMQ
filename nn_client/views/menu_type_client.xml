@@ -1,0 +1,45 @@
+<odoo>
+    <!-- Vues pour Type de Client -->
+    <record id="view_type_client_form" model="ir.ui.view">
+        <field name="name">type.client.form</field>
+        <field name="model">type.client</field>
+        <field name="arch" type="xml">
+            <form string="Type de Client">
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_type_client_tree" model="ir.ui.view">
+        <field name="name">type.client.tree</field>
+        <field name="model">type.client</field>
+        <field name="arch" type="xml">
+            <tree string="Types de Client">
+                <field name="name"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Action pour Types de Client -->
+    <record id="action_type_client" model="ir.actions.act_window">
+        <field name="name">Types de Client</field>
+        <field name="res_model">type.client</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <!-- Menu Configuration -->
+    <menuitem id="menu_client_config"
+              name="Configuration"
+              parent="menu_client_root"
+              sequence="20"/>
+
+    <menuitem id="menu_type_client"
+              name="Types de Clients"
+              parent="menu_client_config"
+              action="action_type_client"/>
+
+</odoo>

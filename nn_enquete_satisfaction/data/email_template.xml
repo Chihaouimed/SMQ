@@ -1,0 +1,14 @@
+<odoo>
+    <record id="enquete_satisfaction_email_template" model="mail.template">
+        <field name="name">Email Enquête Satisfaction</field>
+        <field name="model_id" ref="model_enquete_satisfaction"/>
+        <field name="subject">Merci de répondre à notre enquête de satisfaction</field>
+        <field name="email_from">${(user.email or '')|safe}</field>
+        <field name="email_to">${email_to}</field>
+        <field name="body_html" type="html">
+            <p>Bonjour,</p>
+            <p>Merci de prendre un moment pour répondre à notre questionnaire de satisfaction.</p>
+            <p>Type d'enquête : ${object.type_questionnaire}</p>
+        </field>
+    </record>
+</odoo>

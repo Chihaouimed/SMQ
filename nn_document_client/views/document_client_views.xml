@@ -1,0 +1,152 @@
+<odoo>
+    <!-- Vue en forme de liste (tree) -->
+    <record id="view_document_client_tree" model="ir.ui.view">
+        <field name="name">document.client.tree</field>
+        <field name="model">document.client</field>
+        <field name="arch" type="xml">
+            <tree string="Documents Client" decoration-danger="state=='annule'" decoration-warning="status=='expired'">
+                <field name="name"/>
+                <field name="reference"/>
+                <field name="partner_id"/>
+                <field name="type_document"/>
+                <field name="date_creation"/>
+                <field name="date_expiration"/>
+                <field name="status"/>
+                <field name="state"/>
+                <field name="user_id"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Vue formulaire -->
+    <record id="view_document_client_form" model="ir.ui.view">
+        <field name="name">document.client.form</field>
+        <field name="model">document.client</field>
+        <field name="arch" type="xml">
+            <form string="Document Client">
+                <header>
+                    <button name="action_validate" type="object" string="Valider" class="oe_highlight"
+                            invisible="state != 'brouillon'"/>
+                    <button name="action_cancel" type="object" string="Annuler"
+                            invisible="state not in ('brouillon', 'valide')"/>
+                    <button name="action_draft" type="object" string="Remettre en brouillon"
+                            invisible="state != 'annule'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="brouillon,valide,expire,annule"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_attachments"
+                                type="object"
+                                icon="fa-paperclip"
+                                string="Pièces jointes"
+                                class="oe_stat_button"/>
+                    </div>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="Nom du document"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="reference"/>
+                            <field name="partner_id"/>
+                            <field name="type_document"/>
+                            <field name="user_id"/>
+                        </group>
+                        <group>
+                            <field name="date_creation"/>
+                            <field name="date_expiration"/>
+                            <field name="status"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Description">
+                            <field name="description" placeholder="Description du document..."/>
+                        </page>
+                        <page string="Notes">
+                            <field name="note" placeholder="Notes supplémentaires..."/>
+                        </page>
+                        <page string="Document">
+                            <group>
+                                <field name="document_file" filename="document_filename"/>
+                                <field name="document_filename" invisible="1"/>
+                            </group>
+                        </page>
+                        <page string="Pièces jointes">
+                            <group>
+                                <field name="attachment_count" widget="statinfo" string="Nombre de pièces jointes"/>
+                            </group>
+                            <field name="attachment_ids" widget="many2many_binary"
+                                   options="{'accepted_file_extensions': 'pdf,doc,docx,xls,xlsx,jpg,jpeg,png,txt'}"
+                                   readonly="0" nolabel="1">
+                                <tree>
+                                    <field name="name"/>
+                                    <field name="file_size"/>
+                                    <field name="mimetype"/>
+                                    <field name="create_date"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="activity_ids" widget="mail_activity"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- Vue de recherche -->
+    <record id="view_document_client_search" model="ir.ui.view">
+        <field name="name">document.client.search</field>
+        <field name="model">document.client</field>
+        <field name="arch" type="xml">
+            <search string="Recherche de documents">
+                <field name="name"/>
+                <field name="reference"/>
+                <field name="partner_id"/>
+                <field name="type_document"/>
+                <separator/>
+                <filter string="Mes documents" name="my_documents" domain="[('user_id', '=', uid)]"/>
+                <filter string="Documents actifs" name="active" domain="[('active', '=', True)]"/>
+                <filter string="Documents archivés" name="inactive" domain="[('active', '=', False)]"/>
+                <separator/>
+                <filter string="Brouillons" name="draft" domain="[('state', '=', 'brouillon')]"/>
+                <filter string="Validés" name="validated" domain="[('state', '=', 'valide')]"/>
+                <filter string="Expirés" name="expired_state" domain="[('state', '=', 'expire')]"/>
+                <filter string="Annulés" name="canceled" domain="[('state', '=', 'annule')]"/>
+                <separator/>
+                <filter string="Documents valides" name="valid_doc" domain="[('status', '=', 'valid')]"/>
+                <filter string="Documents expirés" name="expired_doc" domain="[('status', '=', 'expired')]"/>
+                <group expand="0" string="Regrouper par">
+                    <filter string="Client" name="partner" context="{'group_by': 'partner_id'}"/>
+                    <filter string="Type de document" name="type" context="{'group_by': 'type_document'}"/>
+                    <filter string="État" name="state_group" context="{'group_by': 'state'}"/>
+                    <filter string="Responsable" name="user" context="{'group_by': 'user_id'}"/>
+                    <filter string="Date de création" name="date_creation_group"
+                            context="{'group_by': 'date_creation'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action pour ouvrir la vue -->
+    <record id="client_documentation_action" model="ir.actions.act_window">
+        <field name="name">Documents Client</field>
+        <field name="res_model">document.client</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_document_client_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Créez votre premier document client !
+            </p>
+            <p>
+                Les documents client vous permettent de stocker et de suivre les documents importants liés à vos
+                clients.
+            </p>
+        </field>
+    </record>
+
+</odoo>

@@ -1,0 +1,25 @@
+<odoo>
+    <!-- Menu principal -->
+    <menuitem id="menu_compliance_root"
+              name="Conformité"
+              web_icon="compliance,static/description/icon.png"
+              sequence="100"/>
+
+    <!-- Sous-menus -->
+    <menuitem id="menu_compliance_sheet"
+              name="Fiches de conformité"
+              parent="menu_compliance_root"
+              action="action_compliance_sheet"
+              sequence="10"/>
+
+    <menuitem id="menu_compliance_configuration"
+              name="Configuration"
+              parent="menu_compliance_root"
+              sequence="100"/>
+
+    <menuitem id="menu_compliance_type"
+              name="Types de conformité"
+              parent="menu_compliance_configuration"
+              action="action_compliance_type"
+              sequence="10"/>
+</odoo>

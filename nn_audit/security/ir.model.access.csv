@@ -1,0 +1,4 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_audit_audit,access_audit_audit,model_audit_audit,,1,1,1,1
+access_audit_plan,access_audit_plan,model_audit_plan,,1,1,1,1
+

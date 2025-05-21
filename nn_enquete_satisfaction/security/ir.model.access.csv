@@ -1,0 +1,2 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_enquete_satisfaction_user,enquete.satisfaction user,model_enquete_satisfaction,,1,1,1,1

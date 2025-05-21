@@ -1,0 +1,27 @@
+<odoo>
+    <!-- Définir la vue tree pour l'enquête de satisfaction -->
+    <record id="view_enquete_satisfaction_tree" model="ir.ui.view">
+        <field name="name">enquete.satisfaction.tree</field>
+        <field name="model">enquete.satisfaction</field>
+        <field name="arch" type="xml">
+            <tree string="Enquêtes de Satisfaction">
+                <field name="reference"/>
+                <field name="date_debut"/>
+                <field name="date_fin"/>
+                <field name="type_questionnaire"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Définir l'action pour afficher la vue tree -->
+    <record id="action_enquete_satisfaction_tree" model="ir.actions.act_window">
+        <field name="name">Liste des Enquêtes de Satisfaction</field>
+        <field name="res_model">enquete.satisfaction</field>
+        <field name="view_mode">tree,form</field>
+        <field name="target">current</field>
+    </record>
+
+    <!-- Sous-menu pour accéder à la vue tree (liste des enquêtes) -->
+    <menuitem id="menu_enquete_satisfaction_tree" name="Liste des Formulaires" parent="menu_enquete_satisfaction"
+              action="action_enquete_satisfaction_tree" sequence="20"/>
+</odoo>

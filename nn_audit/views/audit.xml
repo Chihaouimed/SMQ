@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Vue formulaire pour audit.audit -->
+    <record id="view_audit_form" model="ir.ui.view">
+        <field name="name">audit.audit.form</field>
+        <field name="model">audit.audit</field>
+        <field name="arch" type="xml">
+            <form string="Audit">
+                <header>
+                    <button name="action_start" string="Démarrer" type="object"
+                            invisible="state != 'non_realise'" class="oe_highlight"/>
+                    <button name="action_done" string="Terminer" type="object"
+                            invisible="state != 'en_cours'" class="oe_highlight"/>
+                    <field name="state" widget="statusbar" statusbar_visible="non_realise,en_cours,realise"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="demandeur_id"/>
+                        </group>
+                        <group>
+                            <field name="create_date" string="Date de création" readonly="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Plan d'audit">
+                            <field name="plan_ids">
+                                <tree editable="bottom">
+                                    <field name="name"/>
+                                    <field name="date_planned"/>
+                                    <field name="responsable_id"/>
+                                    <field name="observations"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Clôture">
+                            <group>
+                                <group>
+                                    <field name="date_debut_cloture"/>
+                                    <field name="date_fin_cloture"/>
+                                </group>
+                                <group>
+                                    <field name="etat_audit"/>
+                                </group>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="view_audit_tree" model="ir.ui.view">
+        <field name="name">audit.audit.tree</field>
+        <field name="model">audit.audit</field>
+        <field name="arch" type="xml">
+            <tree string="Audits" decoration-info="state == 'non_realise'" decoration-warning="state == 'en_cours'"
+                  decoration-success="state == 'realise'">
+                <field name="name"/>
+                <field name="demandeur_id"/>
+                <field name="create_date" string="Date de création"/>
+                <field name="state"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Le reste de votre code XML reste inchangé -->
+</odoo>

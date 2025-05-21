@@ -1,0 +1,7 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_action,access_action,model_action,,1,1,1,1
+access_action_corrective_history,access_action_corrective_history,model_action_corrective_history,,1,1,1,1
+
+
+
+
