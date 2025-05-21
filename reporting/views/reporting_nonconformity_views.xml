@@ -1,0 +1,278 @@
+<odoo>
+    <record id="view_reporting_nonconformity_pivot" model="ir.ui.view">
+        <field name="name">smq.reporting.nonconformity.pivot</field>
+        <field name="model">smq.reporting.nonconformity</field>
+        <field name="arch" type="xml">
+            <pivot string="Reporting Non-conformité">
+                <field name="type"/>
+                <field name="count" type="measure"/>
+                <field name="year"/>
+                <field name="month"/>
+                <field name="quarter"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="view_reporting_nonconformity_graph" model="ir.ui.view">
+        <field name="name">smq.reporting.nonconformity.graph</field>
+        <field name="model">smq.reporting.nonconformity</field>
+        <field name="arch" type="xml">
+            <graph string="Graphique Non-conformité" type="bar">
+                <field name="type"/>
+                <field name="count" type="measure"/>
+                <field name="produit_non_conforme_id" type="measure"/>
+                <field name="month"/>
+            </graph>
+        </field>
+    </record>
+
+    <!-- Définition de l'action -->
+    <record id="action_reporting_nonconformity" model="ir.actions.act_window">
+        <field name="name">Reporting Non-conformité</field>
+        <field name="res_model">smq.reporting.nonconformity</field>
+        <field name="view_mode">pivot,graph</field>
+        <field name="view_ids" eval="[(5, 0, 0),
+            (0, 0, {'view_mode': 'pivot', 'view_id': ref('view_reporting_nonconformity_pivot')}),
+            (0, 0, {'view_mode': 'graph', 'view_id': ref('view_reporting_nonconformity_graph')})
+        ]"/>
+    </record>
+
+    <!-- Menu principal -->
+    <menuitem id="smq_reporting_menu_root"
+              name="SMQ Reporting"
+              sequence="15"
+    />
+
+    <record id="action_reunion" model="ir.actions.act_window">
+        <field name="name">Réunions</field>
+        <field name="res_model">reunion.reunion</field>
+        <field name="view_mode">pivot,graph</field>
+        <field name="view_ids" eval="[(5, 0, 0),
+        (0, 0, {'view_mode': 'pivot', 'view_id': ref('view_reunion_pivot')})
+    ]"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Créer une nouvelle réunion
+            </p>
+        </field>
+    </record>
+    <record id="view_reunion_pivot" model="ir.ui.view">
+        <field name="name">reunion.reunion.pivot</field>
+        <field name="model">reunion.reunion</field>
+        <field name="arch" type="xml">
+            <pivot string="Analyse des réunions">
+                <field name="type_reunion"/> <!-- Groupement -->
+                <field name="state"/> <!-- Groupement -->
+                <field name="responsable_id"/> <!-- Groupement -->
+                <field name="duree_estimee" type="measure"/> <!-- Mesure -->
+            </pivot>
+        </field>
+    </record>
+
+
+    <!-- Définition des vues de reporting pour fiche_risque -->
+    <record id="view_reporting_fiche_risque_pivot" model="ir.ui.view">
+        <field name="name">fiche.risque.pivot</field>
+        <field name="model">fiche.risque</field>
+        <field name="arch" type="xml">
+            <pivot string="Fiche Risque Pivot">
+                <field name="type_risque"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="view_reporting_fiche_risque_graph" model="ir.ui.view">
+        <field name="name">fiche.risque.graph</field>
+        <field name="model">fiche.risque</field>
+        <field name="arch" type="xml">
+            <graph string="Fiche Risque Graph" type="bar">
+                <field name="type_risque"/>
+                <field name="niveau_cout" type="measure"/>
+                <field name="note_globale" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <!-- Définition de l'action pour afficher les vues Pivot et Graph -->
+    <record id="action_reporting_fiche_risque" model="ir.actions.act_window">
+        <field name="name">Reporting Risques</field>
+        <field name="res_model">fiche.risque</field>
+        <field name="view_mode">pivot,graph</field>
+        <field name="view_ids" eval="[(5, 0, 0),
+            (0, 0, {'view_mode': 'pivot', 'view_id': ref('view_reporting_fiche_risque_pivot')}),
+            (0, 0, {'view_mode': 'graph', 'view_id': ref('view_reporting_fiche_risque_graph')})
+        ]"/>
+    </record>
+    <record id="view_reclamation_pivot" model="ir.ui.view">
+        <field name="name">reclamation.pivot</field>
+        <field name="model">reclamation</field>
+        <field name="arch" type="xml">
+            <pivot string="Analyse des Réclamations">
+                <field name="type_reclamation" type="row"/>
+                <field name="gravite" type="row"/>
+                <field name="state" type="col"/>
+                <field name="cout_reclamation" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="view_reclamation_graph" model="ir.ui.view">
+        <field name="name">reclamation.graph</field>
+        <field name="model">reclamation</field>
+        <field name="arch" type="xml">
+            <graph string="Graphique Réclamations" type="bar">
+                <field name="type_reclamation" type="row"/>
+                <field name="cout_reclamation" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="reporting.reclamation_action" model="ir.actions.act_window">
+        <field name="name">Réclamations</field>
+        <field name="res_model">reclamation</field>
+        <field name="view_mode">pivot,graph,tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Créez votre première réclamation
+            </p>
+        </field>
+    </record>
+    <!-- Définition de l'action pour evaluation -->
+
+    <record id="view_evaluation_pivot" model="ir.ui.view">
+        <field name="name">evaluation.pivot</field>
+        <field name="model">evaluation</field>
+        <field name="arch" type="xml">
+            <pivot string="Analyse des évaluations">
+                <field name="fournisseur_id"/>
+                <field name="product_category_id"/>
+                <field name="state"/>
+            </pivot>
+        </field>
+    </record>
+    <record id="view_evaluation_graph" model="ir.ui.view">
+        <field name="name">evaluation.graph</field>
+        <field name="model">evaluation</field>
+        <field name="arch" type="xml">
+            <graph string="Graphique des évaluations" type="bar">
+                <field name="fournisseur_id"/>
+            </graph>
+        </field>
+    </record>
+    <record id="reporting.evaluation_action" model="ir.actions.act_window">
+        <field name="name">Evaluation</field>
+        <field name="res_model">evaluation</field>
+        <field name="view_mode">pivot,graph,tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Créez votre première evaluation
+            </p>
+        </field>
+    </record>
+    <!-- Définition de l'action pour fournisseur -->
+
+    <record id="view_fournisseur_pivot" model="ir.ui.view">
+        <field name="name">fournisseur.pivot</field>
+        <field name="model">fournisseur.fournisseur</field>
+        <field name="arch" type="xml">
+            <pivot string="Analyse Fournisseur">
+                <field name="company_name"/>
+                <field name="fournisseur_type"/>
+                <field name="evaluation_frequency"/>
+                <field name="is_approved"/>
+            </pivot>
+        </field>
+    </record>
+    <record id="view_fournisseur_graph" model="ir.ui.view">
+        <field name="name">fournisseur.fournisseur.graph</field>
+        <field name="model">fournisseur.fournisseur</field>
+        <field name="arch" type="xml">
+            <graph string="Répartition des fournisseurs" type="pie">
+                <field name="fournisseur_type"/>
+            </graph>
+        </field>
+    </record>
+    <record id="reporting.fournisseur_action" model="ir.actions.act_window">
+        <field name="name">fournisseur</field>
+        <field name="res_model">fournisseur.fournisseur</field>
+        <field name="view_mode">pivot,graph,tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Créez votre première fournisseur
+            </p>
+        </field>
+    </record>
+    <!-- Définition de l'action pour enquete -->
+
+    <record id="view_enquete_satisfaction_pivot" model="ir.ui.view">
+        <field name="name">enquete.satisfaction.pivot</field>
+        <field name="model">enquete.satisfaction</field>
+        <field name="arch" type="xml">
+            <pivot string="Analyse Enquêtes de Satisfaction">
+                <field name="date_debut" interval="month"/>
+                <field name="responsible_id"/>
+                <field name="type_questionnaire"/>
+                <field name="action_effectiveness"/>
+                <field name="state"/>
+            </pivot>
+        </field>
+    </record>
+    <record id="view_enquete_satisfaction_graph" model="ir.ui.view">
+        <field name="name">enquete.satisfaction.graph</field>
+        <field name="model">enquete.satisfaction</field>
+        <field name="arch" type="xml">
+            <graph string="État des Enquêtes" type="bar">
+                <field name="state"/>
+            </graph>
+        </field>
+    </record>
+    <record id="reporting.enquete_satisfaction_action" model="ir.actions.act_window">
+        <field name="name">Enquêtes de Satisfaction</field>
+        <field name="res_model">enquete.satisfaction</field>
+        <field name="view_mode">pivot,graph,tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Lancez votre première enquête de satisfaction client.
+            </p>
+        </field>
+    </record>
+    <!-- Définition de l'action pour action -->
+
+    <record id="view_action_pivot" model="ir.ui.view">
+        <field name="name">action.pivot</field>
+        <field name="model">action</field>
+        <field name="arch" type="xml">
+            <pivot string="Analyse des Actions">
+                <field name="type_action"/>
+                <field name="gravite_action"/>
+                <field name="priorite_action"/>
+                <field name="state"/>
+                <field name="taux_realisation"/>
+                <field name="depenses"/>
+            </pivot>
+        </field>
+    </record>
+    <record id="view_action_graph" model="ir.ui.view">
+        <field name="name">action.graph</field>
+        <field name="model">action</field>
+        <field name="arch" type="xml">
+            <graph string="Répartition des Actions" type="bar">
+                <field name="type_action" type="row"/>
+                <field name="taux_realisation" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="reporting.action_action_model" model="ir.actions.act_window">
+        <field name="name">Actions</field>
+        <field name="res_model">action</field>
+        <field name="view_mode">pivot,graph,tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Créez votre première action ici.
+            </p>
+        </field>
+    </record>
+
+
+</odoo>

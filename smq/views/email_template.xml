@@ -1,0 +1,15 @@
+<odoo>
+    <record id="email_template_notification" model="mail.template">
+        <field name="name">Notification Documentation</field>
+        <field name="email_from">${(object.user_id.email or 'noreply@example.com')}</field>
+        <field name="model_id" ref="model_documentation"/>
+        <field name="subject">Notification sur le document ${object.name}</field>
+        <field name="body_html">
+            <![CDATA[
+            <p>Bonjour,</p>
+            <p>Le document <strong>${object.name}</strong> a été mis à jour.</p>
+            <p>Cordialement.</p>
+            ]]>
+        </field>
+    </record>
+</odoo>

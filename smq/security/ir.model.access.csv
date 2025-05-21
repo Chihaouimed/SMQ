@@ -1,0 +1,10 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_documentation,access_documentation,model_documentation,,1,1,1,1
+access_document_informed_person,Access to Document Informed Person,model_document_informed_person,,1,1,1,1
+access_type_documentation,Access to Type Documentation,model_type_documentation,,1,1,1,1
+access_site,Access to Site,model_site,,1,1,1,1
+access_activite,Access to Activite,model_activite,,1,1,1,1
+access_doc_rejection_wizard,doc rejection wizard,model_document_rejection_wizard,,1,1,1,1
+
+
+

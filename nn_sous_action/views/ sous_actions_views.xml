@@ -1,0 +1,62 @@
+<odoo>
+    <!-- Action Window -->
+    <record id="action_sous_actions" model="ir.actions.act_window">
+        <field name="name">Sous Actions</field>
+        <field name="res_model">sous.actions</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <!-- Menu Parent (dans Qualité ou Gestion des Actions par exemple) -->
+    <menuitem id="menu_qualite_root" name="Sous Actions"/>
+
+    <!-- Menu Sous-Actions -->
+    <menuitem id="menu_sous_actions"
+              name="Sous Actions"
+              parent="menu_qualite_root"
+              action="action_sous_actions"/>
+
+    <!-- Vue Liste -->
+    <record id="view_sous_actions_tree" model="ir.ui.view">
+        <field name="name">sous.actions.tree</field>
+        <field name="model">sous.actions</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="numero_sequentiel"/>
+                <field name="responsable_realisation"/>
+                <field name="delai_realisation"/>
+                <field name="gravite"/>
+                <field name="priorite"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Vue Formulaire -->
+    <record id="view_sous_actions_form" model="ir.ui.view">
+        <field name="name">sous.actions.form</field>
+        <field name="model">sous.actions</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="numero_sequentiel" readonly="1"/>
+                        <field name="responsable_realisation"/>
+                        <field name="delai_realisation"/>
+                        <field name="responsable_suivi"/>
+                        <field name="delai_suivi"/>
+                        <field name="gravite"/>
+                        <field name="priorite"/>
+                        <field name="piece_jointe"/>
+                        <field name="taux_realisation"/>
+                        <field name="depenses"/>
+                        <field name="commentaire"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="action_sous_actions" model="ir.actions.act_window">
+        <field name="name">Sous Actions</field>
+        <field name="res_model">sous.actions</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+</odoo>

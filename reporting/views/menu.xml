@@ -1,0 +1,53 @@
+<odoo>
+    <!-- Menu principal -->
+    <menuitem
+            id="menu_reporting_nonconformity"
+            name="Non-conformités"
+            parent="smq_reporting_menu_root"
+            action="reporting.action_reporting_nonconformity"
+            sequence="20"/>
+
+
+    <!-- Menu de reporting Fiche Risque -->
+    <menuitem id="menu_fiche_risque"
+              name="Fiches de Risque"
+              parent="smq_reporting_menu_root"
+              action="action_reporting_fiche_risque"
+              sequence="25"/>
+    <menuitem id="menu_reunion"
+              name="Réunion"
+              parent="smq_reporting_menu_root"
+              action="action_reunion"
+              sequence="30"
+    />
+    <menuitem id="menu_reclamation"
+              name="Reclamation"
+              parent="smq_reporting_menu_root"
+              action="reclamation_action"
+              sequence="30"
+    />
+    <menuitem id="menu_evaluation"
+              name="Evaluation"
+              parent="smq_reporting_menu_root"
+              action="evaluation_action"
+              sequence="30"
+    />
+    <menuitem id="menu_fournisseur"
+              name="Fournisseur"
+              parent="smq_reporting_menu_root"
+              action="fournisseur_action"
+              sequence="30"
+    />
+    <menuitem id="menu_enquete_satisfaction"
+              name="Enquete de satisfaction"
+              parent="smq_reporting_menu_root"
+              action="enquete_satisfaction_action"
+              sequence="30"
+    />
+    <menuitem id="menu_action"
+              name="Action"
+              parent="smq_reporting_menu_root"
+              action="action_action_model"
+              sequence="30"
+    />
+</odoo>

@@ -1,0 +1,40 @@
+<odoo>
+    <!-- Vues pour activite-->
+    <record id="view_activite_form" model="ir.ui.view">
+        <field name="name">activite.form</field>
+        <field name="model">activite</field>
+        <field name="arch" type="xml">
+            <form string="activite associe">
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_activite_tree" model="ir.ui.view">
+        <field name="name">activite.tree</field>
+        <field name="model">activite</field>
+        <field name="arch" type="xml">
+            <tree string="activite associe">
+                <field name="name"/>
+            </tree>
+        </field>
+    </record>
+    <!-- Action pour Types de Documentation -->
+    <record id="action_activite" model="ir.actions.act_window">
+        <field name="name">activite asscoie</field>
+        <field name="res_model">activite</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+
+    <menuitem id="menu_activite"
+              name="activite associe"
+              parent="menu_documentation_config"
+              action="action_activite"/>
+
+
+</odoo>

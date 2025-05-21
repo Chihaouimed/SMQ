@@ -1,0 +1,61 @@
+<odoo>
+    <!-- Vue Liste pour Suggestion Client -->
+    <record id="view_suggestion_client_tree" model="ir.ui.view">
+        <field name="name">suggestion.client.tree</field>
+        <field name="model">suggestion.client</field>
+        <field name="arch" type="xml">
+            <tree string="Suggestions Clients">
+                <field name="date_suggestion"/>
+                <field name="client_concerne"/>
+                <field name="type_suggestion"/>
+                <field name="suggestion_retenue"/>
+                <field name="validation_suggestion"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Vue Formulaire pour Suggestion Client -->
+    <record id="view_suggestion_client_form" model="ir.ui.view">
+        <field name="name">suggestion.client.form</field>
+        <field name="model">suggestion.client</field>
+        <field name="arch" type="xml">
+            <form string="Suggestion Client">
+                <sheet>
+                    <group>
+                        <field name="date_suggestion"/>
+                        <field name="client_concerne"/>
+                        <field name="type_suggestion"/>
+                        <field name="description_suggestion"/>
+                        <field name="receptionnaire_suggestion"/>
+                        <field name="action_associe"/>
+                        <field name="decideur_traitement"/>
+                        <field name="suggestion_retenue"/>
+                        <field name="commentaire_decideur"/>
+                        <field name="piece_jointe" filename="plan_action_filename"/>
+                        <field name="validation_suggestion"/>
+                        <field name="client_ids" widget="Many2many_tags"/>
+
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Action pour afficher la liste des Suggestions Clients -->
+    <record id="action_suggestion_client" model="ir.actions.act_window">
+        <field name="name">Suggestions Clients</field>
+        <field name="res_model">suggestion.client</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="view_suggestion_client_tree"/>
+        <field name="target">current</field>
+    </record>
+
+    <!-- Menu de niveau supérieur pour l'interface -->
+    <menuitem id="menu_suggestion_root" name="Suggestions Clients" sequence="10"/>
+
+    <!-- Menu pour accéder à la liste des Suggestions Clients -->
+    <menuitem id="menu_suggestion_client" name="Suggestions" parent="menu_suggestion_root"
+              action="action_suggestion_client" sequence="1"/>
+
+    <!-- Vous pouvez ajouter d'autres sous-menus si nécessaire -->
+</odoo>

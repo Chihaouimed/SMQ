@@ -1,0 +1,178 @@
+<odoo>
+    <!-- Vue Formulaire -->
+    <record id="view_documentation_form" model="ir.ui.view">
+        <field name="name">documentation.form</field>
+        <field name="model">documentation</field>
+        <field name="arch" type="xml">
+            <form string="Documentation">
+                <header>
+                    <button name="action_analyse" type="object" string="Brouillon" class="btn-info"
+                    />
+                    <button name="action_set_verification" type="object" string="En attente de vérification"
+                            class="btn-danger"/>
+                    <!-- Bouton pour changer l'état en "approved" -->
+                    <button name="action_change_state_approved"
+                            type="object"
+                            string="En attente d'approbation"
+                            class="btn-primary"
+                    />
+                    <button name="action_set_approbation" type="object" string="Envoyer en approbation"
+                            class="btn-danger"/>
+                    <button name="action_rejeter" type="object" string="Rejeter"
+                            icon="fa-times" class="btn btn-danger"
+                            invisible="state in ('rejeted', 'archive')"
+                            confirm="Êtes-vous sûr de vouloir rejeter cette documentation ?"/>
+
+
+                    <button name="action_archive" type="object" string="Archiver" class="btn-danger"/>
+
+
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <field name="rejected" invisible="1"/>
+                    <div class="alert alert-danger text-center o_form_header" role="status"
+                         invisible="not rejected"
+                    >
+                        <a class="close" data-dismiss="alert" href="#" aria-label="Close">x</a>
+                        <div>
+                            <strong>Raison de Refus :
+                                <field name="raison_rejet"/>
+                            </strong>
+                        </div>
+                    </div>
+                    <group col="2">
+                        <group>
+                            <field name="name"/>
+                            <field name="code"/>
+                            <field name="type_documentation"/>
+                            <field name="file" widget="pdf_viewer"/>
+                            <field name="file_name"/>
+                            <field name="version"/>
+                            <field name="libelle"/>
+                            <field name="liste_informee"/>
+                        </group>
+                        <group>
+                            <field name="site"/>
+
+
+                            <field name="activite"/>
+                            <field name="selection_redacteur"/>
+                            <field name="selection_verificateur"/>
+                            <field name="selection_approbateur"/>
+                            <field name="date_creation" readonly="1"/>
+                        </group>
+                    </group>
+
+
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="view_documentation_search" model="ir.ui.view">
+        <field name="name">documentation.search</field>
+        <field name="model">documentation</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="state"/>
+                <field name="code"/>
+
+
+                <group expand="0" string="Groupes">
+
+                    <filter name="active_state" string="Actifs" domain="[('state', '!=', 'archivé')]"
+                            context="{'group_by': 'state'}"/>
+                    <filter name="active_type_doc" string="type de documentation"
+                            context="{'group_by': 'type_documentation'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Vue Liste (Tree) -->
+    <record id="view_documentation_tree" model="ir.ui.view">
+        <field name="name">documentation.tree</field>
+        <field name="model">documentation</field>
+        <field name="arch" type="xml">
+            <tree string="Documentation"
+                  decoration-info="state == 'draft'"
+                  decoration-success="state == 'verification'"
+                  decoration-warning="state == 'approbation'"
+                  decoration-primary="state == 'approved'"
+                  decoration-danger="state == 'rejeted'"
+                  decoration-muted="state == 'archive'">
+
+
+                <field name="name"/>
+                <field name="code"/>
+                <field name="type_documentation"/>
+                <field name="file"/>
+                <field name="file_name"/>
+                <field name="version"/>
+                <field name="libelle"/>
+                <field name="liste_informee"/>
+                <field name="site"/>
+                <field name="state" widget="statusbar"/>
+                <field name="activite"/>
+                <field name="selection_redacteur"/>
+                <field name="selection_verificateur"/>
+                <field name="selection_approbateur"/>
+                <field name="date_creation"/>
+                <field name="raison_rejet"/>
+
+                <button name="action_rejeter" type="object" string="Rejeter"
+                        icon="fa-times" class="btn btn-danger"
+                        invisible="state in ('rejete', 'archivé')"
+                        confirm="Êtes-vous sûr de vouloir rejeter cette documentation ?"/>
+
+
+            </tree>
+        </field>
+    </record>
+
+    <!-- Action pour afficher le module -->
+    <record id="documentation_action" model="ir.actions.act_window">
+        <field name="name">Documentation</field>
+        <field name="res_model">documentation</field>
+        <field name="view_mode">tree,form</field>
+        <field name="context">
+            {
+            'search_default_active_state': 1,
+            }
+
+        </field>
+
+    </record>
+
+    <!-- Menu Documentation -->
+    <menuitem id="menu_documentation_root"
+              name="Documentation"
+              sequence="10"/>
+
+    <menuitem id="menu_documentation"
+              name="Gestion de Documentation"
+              parent="menu_documentation_root"
+              action="documentation_action"
+              sequence="10"/>
+    <menuitem id="menu_client_documents_root"
+              name="Documents Client"
+              parent="menu_documentation_root"
+              sequence="20"/>
+
+    <record id="client_documentation_action" model="ir.actions.act_window">
+        <field name="name">Documents Client</field>
+        <field name="res_model">documentation</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('type_documentation', '=', 'client')]</field>
+        <field name="context">
+            {
+            'search_default_active_state': 1,
+            'default_type_documentation': 'client'
+            }
+        </field>
+    </record>
+
+    <!-- Sous-menu pour accéder aux documents clients -->
+
+</odoo>

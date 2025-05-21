@@ -1,0 +1,67 @@
+<odoo>
+    <!-- Vues pour Type de Documentation -->
+    <record id="view_type_documentation_form" model="ir.ui.view">
+        <field name="name">type.documentation.form</field>
+        <field name="model">type.documentation</field>
+        <field name="arch" type="xml">
+            <form string="Type de Documentation">
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="state"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_type_documentation_tree" model="ir.ui.view">
+        <field name="name">type.documentation.tree</field>
+        <field name="model">type.documentation</field>
+        <field name="arch" type="xml">
+            <tree string="Type de Documentation">
+
+                <field name="name"/>
+                <field name="state"/>
+            </tree>
+        </field>
+    </record>
+    <record id="view_type_documentation_search" model="ir.ui.view">
+        <field name="name">type.documentation.search</field>
+        <field name="model">type.documentation</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="state"/>
+
+
+                <group expand="0" string="Groupes">
+                    <filter name="group_by_type" string="Type de Documentation" domain="[]"
+                            context="{'group_by': 'name'}"/>
+                    <filter name="active_state" string="Actifs" domain="[('state', '!=', 'archivé')]"
+                            context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action pour Types de Documentation -->
+    <record id="action_type_documentation" model="ir.actions.act_window">
+        <field name="name">Types de Documentation</field>
+        <field name="res_model">type.documentation</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_type_documentation_search"/>
+
+    </record>
+
+
+    <menuitem id="menu_documentation_config"
+              name="Configuration"
+              parent="menu_documentation_root"
+              sequence="50"/>
+
+    <menuitem id="menu_type_documentation"
+              name="Types de documentation"
+              parent="menu_documentation_config"
+              action="action_type_documentation"/>
+</odoo>

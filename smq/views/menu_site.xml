@@ -1,0 +1,40 @@
+<odoo>
+    <!-- Vues pour site-->
+    <record id="view_site_form" model="ir.ui.view">
+        <field name="name">site.form</field>
+        <field name="model">site</field>
+        <field name="arch" type="xml">
+            <form string="site associe">
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_site_tree" model="ir.ui.view">
+        <field name="name">site.tree</field>
+        <field name="model">site</field>
+        <field name="arch" type="xml">
+            <tree string="site associe">
+                <field name="name"/>
+            </tree>
+        </field>
+    </record>
+    <!-- Action pour Types de Documentation -->
+    <record id="action_site" model="ir.actions.act_window">
+        <field name="name">Site asscoie</field>
+        <field name="res_model">site</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+
+    <menuitem id="menu_site"
+              name="Site associe"
+              parent="menu_documentation_config"
+              action="action_site"/>
+
+
+</odoo>
