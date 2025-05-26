@@ -3,3 +3,5 @@ access_evaluation,access_evaluation,model_evaluation,,1,1,1,1
 access_evaluation_criteria,access_evaluation_criteria,model_evaluation_criteria,,1,1,1,1
 access_product_category,access_product_category,model_product_category,,1,1,1,1
 access_action_request,access_action_request,model_action_request,,1,1,1,1
+access_supplier_ai_analysis,access_supplier_ai_analysis,model_supplier_ai_analysis,,1,1,1,1
+access_supplier_ai_chatbot,access_supplier_ai_chatbot,model_supplier_ai_chatbot,,1,1,1,1

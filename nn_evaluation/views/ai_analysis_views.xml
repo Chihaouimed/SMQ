@@ -1,0 +1,380 @@
+<!-- views/ai_analysis_views.xml -->
+<odoo>
+    <!-- Vue formulaire pour l'analyse IA -->
+    <record id="view_supplier_ai_analysis_form" model="ir.ui.view">
+        <field name="name">supplier.ai.analysis.form</field>
+        <field name="model">supplier.ai.analysis</field>
+        <field name="arch" type="xml">
+            <form string="Analyse IA Fournisseur">
+                <header>
+                    <button name="analyze_supplier_performance" type="object"
+                            string="Lancer l'analyse IA" class="btn-primary"
+                            invisible="state != 'draft'"/>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="Nom de l'analyse"/>
+                        </h1>
+                    </div>
+
+                    <!-- KPIs de l'analyse -->
+                    <div class="oe_button_box" name="button_box" invisible="state != 'completed'">
+                        <button type="object" class="oe_stat_button" icon="fa-warning">
+                            <field name="risk_score" widget="statinfo" string="Score de Risque"/>
+                        </button>
+                        <button type="object" class="oe_stat_button" icon="fa-check-circle">
+                            <field name="confidence_level" widget="statinfo" string="% Confiance"/>
+                        </button>
+                        <button type="object" class="oe_stat_button" icon="fa-clock-o">
+                            <field name="processing_time" widget="statinfo" string="Temps (s)"/>
+                        </button>
+                        <button type="object" class="oe_stat_button" icon="fa-cogs">
+                            <field name="tokens_used" widget="statinfo" string="Tokens"/>
+                        </button>
+                    </div>
+
+                    <group>
+                        <group>
+                            <field name="fournisseur_id" options="{'no_create': True}"/>
+                            <field name="analysis_type"/>
+                            <field name="average_score" widget="progressbar"/>
+                        </group>
+                        <group>
+                            <field name="created_date" readonly="1"/>
+                            <field name="predicted_trend" widget="badge"
+                                   decoration-success="predicted_trend=='improving'"
+                                   decoration-info="predicted_trend=='stable'"
+                                   decoration-warning="predicted_trend=='declining'"
+                                   decoration-danger="predicted_trend=='critical'"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Insights et Recommandations" invisible="state == 'draft'">
+                            <group>
+                                <field name="key_insights" widget="html"
+                                       placeholder="Les insights clés apparaîtront ici après l'analyse..."/>
+                            </group>
+                            <separator string="Recommandations IA"/>
+                            <group>
+                                <field name="recommendations" widget="html"
+                                       placeholder="Les recommandations apparaîtront ici après l'analyse..."/>
+                            </group>
+                        </page>
+
+                        <page string="Données techniques" invisible="state == 'draft'">
+                            <group>
+                                <field name="input_data" widget="ace" options="{'mode': 'json'}" readonly="1"/>
+                            </group>
+                            <separator string="Réponse brute de l'IA"/>
+                            <group>
+                                <field name="ai_response" widget="text" readonly="1"/>
+                            </group>
+                        </page>
+
+                        <page string="Analyse structurée" invisible="state == 'draft'">
+                            <field name="structured_analysis" widget="ace" options="{'mode': 'json'}" readonly="1"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- Vue liste des analyses IA -->
+    <record id="view_supplier_ai_analysis_tree" model="ir.ui.view">
+        <field name="name">supplier.ai.analysis.tree</field>
+        <field name="model">supplier.ai.analysis</field>
+        <field name="arch" type="xml">
+            <tree string="Analyses IA"
+                  decoration-danger="risk_score &gt; 7"
+                  decoration-warning="risk_score &gt; 5"
+                  decoration-success="risk_score &lt;= 5"
+                  decoration-info="state == 'draft'"
+                  decoration-muted="state == 'error'">
+                <field name="name"/>
+                <field name="fournisseur_id"/>
+                <field name="analysis_type" widget="badge"/>
+                <field name="state" widget="badge"/>
+                <field name="risk_score" widget="progressbar"/>
+                <field name="confidence_level"/>
+                <field name="predicted_trend" widget="badge"/>
+                <field name="created_date"/>
+                <button name="analyze_supplier_performance" type="object"
+                        string="Relancer" class="btn-sm btn-secondary"
+                        invisible="state == 'analyzing'"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Vue graphique des analyses IA -->
+    <record id="view_supplier_ai_analysis_graph" model="ir.ui.view">
+        <field name="name">supplier.ai.analysis.graph</field>
+        <field name="model">supplier.ai.analysis</field>
+        <field name="arch" type="xml">
+            <graph string="Évolution des scores de risque IA" type="line">
+                <field name="created_date" type="row" interval="week"/>
+                <field name="risk_score" type="measure"/>
+                <field name="fournisseur_id" type="col"/>
+            </graph>
+        </field>
+    </record>
+
+    <!-- Vue pivot des analyses IA -->
+    <record id="view_supplier_ai_analysis_pivot" model="ir.ui.view">
+        <field name="name">supplier.ai.analysis.pivot</field>
+        <field name="model">supplier.ai.analysis</field>
+        <field name="arch" type="xml">
+            <pivot string="Analyses IA - Vue Pivot">
+                <field name="analysis_type" type="row"/>
+                <field name="predicted_trend" type="col"/>
+                <field name="risk_score" type="measure"/>
+                <field name="confidence_level" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <!-- Action pour les analyses IA -->
+    <record id="action_supplier_ai_analysis" model="ir.actions.act_window">
+        <field name="name">Analyses IA</field>
+        <field name="res_model">supplier.ai.analysis</field>
+        <field name="view_mode">tree,form,graph,pivot</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Aucune analyse IA trouvée
+            </p>
+            <p>
+                Lancez une analyse IA pour obtenir des insights avancés sur vos fournisseurs.
+            </p>
+        </field>
+    </record>
+
+    <!-- Vue de recherche pour les analyses IA -->
+    <record id="view_supplier_ai_analysis_search" model="ir.ui.view">
+        <field name="name">supplier.ai.analysis.search</field>
+        <field name="model">supplier.ai.analysis</field>
+        <field name="arch" type="xml">
+            <search string="Rechercher des analyses IA">
+                <field name="name"/>
+                <field name="fournisseur_id"/>
+                <field name="analysis_type"/>
+                <separator/>
+                <filter string="Terminées" name="completed" domain="[('state', '=', 'completed')]"/>
+                <filter string="En cours" name="analyzing" domain="[('state', '=', 'analyzing')]"/>
+                <filter string="Erreur" name="error" domain="[('state', '=', 'error')]"/>
+                <separator/>
+                <filter string="Risque élevé" name="high_risk" domain="[('risk_score', '&gt;', 7)]"/>
+                <filter string="Tendance critique" name="critical_trend" domain="[('predicted_trend', '=', 'critical')]"/>
+                <group expand="0" string="Regrouper par">
+                    <filter string="Fournisseur" name="group_supplier" context="{'group_by': 'fournisseur_id'}"/>
+                    <filter string="Type d'analyse" name="group_type" context="{'group_by': 'analysis_type'}"/>
+                    <filter string="État" name="group_state" context="{'group_by': 'state'}"/>
+                    <filter string="Tendance" name="group_trend" context="{'group_by': 'predicted_trend'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Wizard pour analyse en masse -->
+    <record id="view_supplier_bulk_ai_analysis_wizard" model="ir.ui.view">
+        <field name="name">supplier.bulk.ai.analysis.wizard</field>
+        <field name="model">supplier.ai.analysis</field>
+        <field name="arch" type="xml">
+            <form string="Analyse IA en masse">
+                <group>
+                    <field name="analysis_type"/>
+                    <field name="fournisseur_id" string="Fournisseurs" widget="many2many_tags"
+                           help="Laissez vide pour analyser tous les fournisseurs actifs"/>
+                </group>
+                <footer>
+                    <button name="bulk_analyze_suppliers" type="object"
+                            string="Lancer les analyses" class="btn-primary"/>
+                    <button string="Annuler" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- Vue du chatbot IA -->
+    <record id="view_supplier_ai_chatbot_form" model="ir.ui.view">
+        <field name="name">supplier.ai.chatbot.form</field>
+        <field name="model">supplier.ai.chatbot</field>
+        <field name="arch" type="xml">
+            <form string="Assistant IA Fournisseurs">
+                <header>
+                    <field name="active_session" widget="boolean_toggle"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="Session de chat IA"/>
+                        </h1>
+                    </div>
+
+                    <group>
+                        <field name="user_id" readonly="1"/>
+                    </group>
+
+                    <!-- Interface de chat simplifiée -->
+                    <group string="Conversation">
+                        <field name="conversation_history" widget="html" readonly="1"
+                               placeholder="La conversation apparaîtra ici..."/>
+                    </group>
+
+                    <group string="Nouvelle question">
+                        <field name="current_question" placeholder="Posez votre question sur les fournisseurs..."/>
+                        <button name="ask_ai_question" type="object" string="Envoyer" class="btn-primary"/>
+                    </group>
+
+                    <!-- Suggestions de questions -->
+                    <div class="alert alert-info mt-3">
+                        <strong>Questions suggérées :</strong><br/>
+                        • Quels sont mes fournisseurs les plus performants ?<br/>
+                        • Analyse les tendances de performance du fournisseur X<br/>
+                        • Quels fournisseurs présentent des risques ?<br/>
+                        • Recommande des actions d'amélioration<br/>
+                        • Compare les performances par catégorie
+                    </div>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Vue liste des sessions chatbot -->
+    <record id="view_supplier_ai_chatbot_tree" model="ir.ui.view">
+        <field name="name">supplier.ai.chatbot.tree</field>
+        <field name="model">supplier.ai.chatbot</field>
+        <field name="arch" type="xml">
+            <tree string="Sessions Chatbot IA">
+                <field name="name"/>
+                <field name="user_id"/>
+                <field name="active_session" widget="boolean_toggle"/>
+                <field name="create_date"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Action pour le chatbot IA -->
+    <record id="action_supplier_ai_chatbot" model="ir.actions.act_window">
+        <field name="name">Assistant IA</field>
+        <field name="res_model">supplier.ai.chatbot</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Aucune session de chat trouvée
+            </p>
+            <p>
+                Créez une nouvelle session pour interagir avec l'assistant IA.
+            </p>
+        </field>
+    </record>
+
+    <!-- Extension de la vue évaluation pour intégrer l'IA -->
+    <record id="view_evaluation_form_ai_extended" model="ir.ui.view">
+        <field name="name">evaluation.form.ai.extended</field>
+        <field name="model">evaluation</field>
+        <field name="inherit_id" ref="nn_evaluation.view_evaluation_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@class='oe_button_box']" position="inside">
+                <button type="object" class="oe_stat_button" icon="fa-magic"
+                        name="action_generate_ai_insights">
+                    <field name="ai_analysis_count" widget="statinfo" string="Analyses IA"/>
+                </button>
+            </xpath>
+            <xpath expr="//notebook" position="inside">
+                <page string="Analyses IA">
+                    <group>
+                        <button name="action_generate_ai_insights" type="object"
+                                string="Générer une analyse IA" class="btn-primary"/>
+                    </group>
+                    <field name="ai_analysis_ids">
+                        <tree>
+                            <field name="name"/>
+                            <field name="analysis_type"/>
+                            <field name="state"/>
+                            <field name="risk_score"/>
+                            <field name="confidence_level"/>
+                            <field name="created_date"/>
+                        </tree>
+                    </field>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Configuration OpenAI dans les paramètres -->
+    <record id="view_general_configuration_openai" model="ir.ui.view">
+        <field name="name">res.config.settings.openai</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[hasclass('settings')]" position="inside">
+                <div class="app_settings_block" data-string="Intelligence Artificielle" string="Intelligence Artificielle" data-key="ai_settings">
+                    <h2>Configuration OpenAI</h2>
+                    <div class="row mt16 o_settings_container">
+                        <div class="col-12 col-lg-6 o_setting_box">
+                            <div class="o_setting_left_pane">
+                                <field name="openai_api_key"/>
+                            </div>
+                            <div class="o_setting_right_pane">
+                                <label for="openai_api_key"/>
+                                <div class="text-muted">
+                                    Clé API OpenAI pour les analyses IA des fournisseurs
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-lg-6 o_setting_box">
+                            <div class="o_setting_left_pane">
+                                <field name="openai_model"/>
+                            </div>
+                            <div class="o_setting_right_pane">
+                                <label for="openai_model"/>
+                                <div class="text-muted">
+                                    Modèle OpenAI à utiliser
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Menus -->
+    <menuitem id="menu_supplier_ai_root" name="IA Fournisseurs" sequence="60"/>
+
+    <menuitem id="menu_supplier_ai_analysis"
+              name="Analyses IA"
+              parent="menu_supplier_ai_root"
+              action="action_supplier_ai_analysis"
+              sequence="10"/>
+
+    <menuitem id="menu_supplier_ai_chatbot"
+              name="Assistant IA"
+              parent="menu_supplier_ai_root"
+              action="action_supplier_ai_chatbot"
+              sequence="20"/>
+
+    <!-- Action rapide pour nouvelle analyse -->
+    <record id="action_supplier_ai_analysis_new" model="ir.actions.act_window">
+        <field name="name">Nouvelle Analyse IA</field>
+        <field name="res_model">supplier.ai.analysis</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="context">{'default_analysis_type': 'performance_trend'}</field>
+    </record>
+
+    <menuitem id="menu_supplier_ai_analysis_new"
+              name="Nouvelle Analyse"
+              parent="menu_supplier_ai_root"
+              action="action_supplier_ai_analysis_new"
+              sequence="5"/>
+
+</odoo>
