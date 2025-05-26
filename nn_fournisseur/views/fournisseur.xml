@@ -1,0 +1,173 @@
+<odoo>
+    <!-- Vue formulaire pour les fournisseurs -->
+    <record id="view_fournisseur_form" model="ir.ui.view">
+        <field name="name">fournisseur.fournisseur.form</field>
+        <field name="model">fournisseur.fournisseur</field>
+        <field name="arch" type="xml">
+            <form string="Fournisseur">
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="code" placeholder="Code fournisseur"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="fournisseur_id"/>
+                            <field name="company_name"/>
+
+                            <field name="category_id"/>
+                            <field name="fournisseur_type"/>
+                            <field name="is_approved"/>
+                        </group>
+                        <group>
+                            <field name="phone"/>
+                            <field name="email"/>
+                            <field name="introduction_date"/>
+                            <field name="evaluation_frequency"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="address"/>
+                    </group>
+                    <group>
+                        <field name="attachment" filename="attachment_name"/>
+                        <field name="attachment_name" invisible="1"/>
+                    </group>
+                    <notebook>
+                        <page string="Réclamations">
+                            <field name="claim_ids">
+                                <tree>
+                                    <field name="name" readonly="1"/>
+                                    <field name="date_reclamation"/>
+                                    <field name="fournisseur_id"/>
+                                    <field name="description"/>
+                                    <field name="type_reclamation"/>
+                                    <field name="gravite"/>
+                                    <field name="state"/>
+                                    <field name="designation"/>
+                                    <field name="attachment" filename="attachment_name"/>
+                                    <field name="actions"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Évaluations">
+                            <field name="evaluation_ids">
+                                <tree>
+
+                                    <field name="fournisseur_id"/>
+                                    <field name="product_category_id"/>
+                                    <field name="periodicity"/>
+                                    <field name="state"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Vue liste pour les fournisseurs -->
+    <record id="view_fournisseur_tree" model="ir.ui.view">
+        <field name="name">fournisseur.fournisseur.tree</field>
+        <field name="model">fournisseur.fournisseur</field>
+        <field name="arch" type="xml">
+            <tree string="Fournisseurs">
+                <field name="code"/>
+
+                <field name="fournisseur_id"/>
+
+                <field name="company_name"/>
+                <field name="phone"/>
+                <field name="email"/>
+                <field name="fournisseur_type"/>
+                <field name="is_approved"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Vue recherche pour les fournisseurs -->
+    <record id="view_fournisseur_search" model="ir.ui.view">
+        <field name="name">fournisseur.fournisseur.search</field>
+        <field name="model">fournisseur.fournisseur</field>
+        <field name="arch" type="xml">
+            <search string="Rechercher des fournisseurs">
+                <field name="code"/>
+                <field name="company_name"/>
+                <field name="email"/>
+                <separator/>
+                <filter string="Agréés" name="approved" domain="[('is_approved', '=', True)]"/>
+                <group expand="0" string="Regrouper par">
+                    <filter string="Catégorie" name="category" context="{'group_by': 'category_id'}"/>
+                    <filter string="Type" name="type" context="{'group_by': 'fournisseur_type'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Vue formulaire pour les catégories -->
+    <record id="view_fournisseur_category_form" model="ir.ui.view">
+        <field name="name">fournisseur.category.form</field>
+        <field name="model">fournisseur.category</field>
+        <field name="arch" type="xml">
+            <form string="Catégorie de fournisseur">
+                <sheet>
+                    <group>
+                        <field name="description"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Vue liste pour les catégories -->
+    <record id="view_fournisseur_category_tree" model="ir.ui.view">
+        <field name="name">fournisseur.category.tree</field>
+        <field name="model">fournisseur.category</field>
+        <field name="arch" type="xml">
+            <tree string="Catégories de fournisseur">
+                <field name="name"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Actions -->
+    <record id="action_fournisseur" model="ir.actions.act_window">
+        <field name="name">Fournisseurs</field>
+        <field name="res_model">fournisseur.fournisseur</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_fournisseur_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Créer un nouveau fournisseur
+            </p>
+        </field>
+    </record>
+
+    <record id="action_fournisseur_category" model="ir.actions.act_window">
+        <field name="name">Catégories</field>
+        <field name="res_model">fournisseur.category</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Créer une nouvelle catégorie de fournisseur
+            </p>
+        </field>
+    </record>
+
+    <!-- Action pour accéder aux réclamations fournisseur -->
+    <record id="action_fournisseur_claim" model="ir.actions.act_window">
+        <field name="name">Réclamations</field>
+        <field name="res_model">reclamation</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Créer une nouvelle réclamation fournisseur
+            </p>
+        </field>
+    </record>
+    <record id="evaluation_action" model="ir.actions.act_window">
+        <field name="name">Évaluations</field>
+        <field name="res_model">evaluation</field> <!-- Modèle que tu utilises -->
+    </record>
+</odoo>

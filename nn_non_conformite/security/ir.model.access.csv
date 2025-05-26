@@ -1,0 +1,9 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_non_conformite,access_non_conformite,model_non_conformite,,1,1,1,1
+access_actions_correctives,access_actions_correctives,model_actions_correctives,,1,1,1,1
+
+
+
+
+
+

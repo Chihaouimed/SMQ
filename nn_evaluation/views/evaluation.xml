@@ -1,0 +1,84 @@
+<odoo>
+    <data>
+        <!-- Vue Formulaire -->
+        <record id="view_evaluation_form" model="ir.ui.view">
+            <field name="name">evaluation.form</field>
+            <field name="model">evaluation</field>
+            <field name="arch" type="xml">
+                <form string="Évaluation">
+                    <header>
+                        <field name="state" widget="statusbar"/>
+
+                        <button name="action_pending"
+                                type="object"
+                                string="Passer en attente"
+                                class="btn-info"
+                                invisible="state != 'draft'"/>
+
+                        <button name="action_validate"
+                                type="object"
+                                string="Valider"
+                                class="btn-success"
+                                invisible="state != 'pending'"/>
+
+                        <button name="action_reset_draft"
+                                type="object"
+                                string="Remettre en brouillon"
+                                class="btn-warning"
+                                invisible="state == 'draft'"/>
+                    </header>
+                    <sheet>
+                        <group>
+                            <field name="fournisseur_id"/>  <!-- Correction ici -->
+                            <field name="product_category_id"/>
+                            <field name="periodicity"/>
+                            <field name="state"/>
+                        </group>
+                        <group>
+                            <field name="evaluation_criteria_ids">
+                                <tree editable="bottom">
+                                    <field name="name"/>
+                                    <field name="score"/>
+                                    <field name="comment"/>
+                                </tree>
+                            </field>
+                        </group>
+                        <group>
+                            <field name="action_ids" widget="many2many_tags"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!-- Vue Liste -->
+        <record id="view_evaluation_tree" model="ir.ui.view">
+            <field name="name">evaluation.tree</field>
+            <field name="model">evaluation</field>
+            <field name="arch" type="xml">
+                <tree string="Évaluations"
+                      decoration-info="state == 'draft'"
+                      decoration-warning="state == 'pending'"
+                      decoration-success="state == 'validated'">
+                    <field name="fournisseur_id"/>  <!-- Correction ici -->
+                    <field name="product_category_id"/>
+                    <field name="periodicity"/>
+                    <field name="state"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- Action -->
+        <record id="evaluation_action" model="ir.actions.act_window">
+            <field name="name">Évaluations</field>
+            <field name="res_model">evaluation</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <!-- Menu -->
+        <menuitem id="menu_evaluation_root" name="Évaluation" sequence="30"/>
+        <menuitem id="menu_evaluation" name="Gestion des Évaluations" parent="menu_evaluation_root"
+                  action="evaluation_action" sequence="30"/>
+
+    </data>
+</odoo>

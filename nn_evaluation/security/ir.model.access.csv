@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_evaluation,access_evaluation,model_evaluation,,1,1,1,1
+access_evaluation_criteria,access_evaluation_criteria,model_evaluation_criteria,,1,1,1,1
+access_product_category,access_product_category,model_product_category,,1,1,1,1
+access_action_request,access_action_request,model_action_request,,1,1,1,1

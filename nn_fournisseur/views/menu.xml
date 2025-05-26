@@ -1,0 +1,32 @@
+<odoo>
+    <!-- Menu principal -->
+    <menuitem id="menu_fournisseur_root"
+              name="Fournisseurs"
+              sequence="40"/>
+
+    <!-- Sous-menus -->
+    <menuitem id="menu_fournisseur"
+              name="Fournisseurs"
+              parent="menu_fournisseur_root"
+              sequence="10"
+              action="action_fournisseur"/>
+
+    <menuitem id="menu_fournisseur_category"
+              name="Catégories"
+              parent="menu_fournisseur_root"
+              sequence="20"
+              action="action_fournisseur_category"/>
+
+    <!-- Intégration des menus pour les réclamations et évaluations -->
+    <menuitem id="menu_fournisseur_claim"
+              name="Réclamations"
+              parent="menu_fournisseur_root"
+              sequence="30"
+              action="action_fournisseur_claim"/>
+
+    <menuitem id="menu_fournisseur_evaluation"
+              name="Évaluations"
+              parent="menu_fournisseur_root"
+              sequence="40"
+              action="evaluation_action"/>
+</odoo>
