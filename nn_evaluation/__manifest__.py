@@ -1,7 +1,8 @@
-# -- coding: utf-8 --
+# nn_evaluation/__manifest__.py
+# -*- coding: utf-8 -*-
 {
     'name': 'Supplier AI Analysis',
-    'version': '1.0',
+    'version': '17.0.1.0.0',
     'category': 'Quality/Suppliers',
     'summary': 'Intelligence artificielle pour l\'analyse des fournisseurs',
     'description': """
@@ -19,36 +20,42 @@ Fonctionnalités principales:
 • Alertes automatiques basées sur l'IA
 
 Intégration:
-• Compatible avec le module nn_evaluation
-• Utilise l'API OpenAI pour les analyses
+• Compatible avec Odoo 17
+• Utilise l'API OpenAI pour les analyses (optionnel)
 • Interface utilisateur intuitive
 • Rapports et tableaux de bord
 
 Configuration requise:
-• Clé API OpenAI
-• Module nn_evaluation installé
+• Clé API OpenAI (optionnelle - mode simulation disponible)
+• Modules base et mail installés
     """,
     'author': 'Votre Entreprise',
     'website': 'https://www.votreentreprise.com',
     'depends': [
         'base',
         'mail',
-        'hr',
-        'nn_evaluation',
-        'nn_fournisseur'
+        'product',
+        # CORRECTION: Supprimer 'nn_fournisseur' s'il n'existe pas
+        # 'nn_fournisseur'
     ],
     'external_dependencies': {
-        'python': ['openai', 'json']
+        'python': ['openai']  # Suppression de 'json' car c'est natif à Python
     },
     'data': [
         'security/ir.model.access.csv',
-        'views/ai_analysis_views.xml',
         'data/ai_sequence.xml',
+        'views/evaluation.xml',  # CORRECTION: Renommer pour cohérence
+        'views/ai_analysis_views.xml',
     ],
     'demo': [],
+    'assets': {
+        'web.assets_backend': [
+            # Ajouter des assets CSS/JS si nécessaire
+        ],
+    },
     'installable': True,
-    'application': False,
+    'application': True,
     'auto_install': False,
     'license': 'LGPL-3',
-    'sequence': 100,
+
 }

@@ -6,6 +6,7 @@
             <pivot string="Reporting Non-conformité">
                 <field name="type"/>
                 <field name="count" type="measure"/>
+                <field name="nonconformity_id" type="measure"/>
                 <field name="year"/>
                 <field name="month"/>
                 <field name="quarter"/>
@@ -20,7 +21,6 @@
             <graph string="Graphique Non-conformité" type="bar">
                 <field name="type"/>
                 <field name="count" type="measure"/>
-                <field name="produit_non_conforme_id" type="measure"/>
                 <field name="month"/>
             </graph>
         </field>
@@ -108,7 +108,7 @@
         <field name="model">reclamation</field>
         <field name="arch" type="xml">
             <pivot string="Analyse des Réclamations">
-                <field name="type_reclamation" type="row"/>
+                <field name="type_reclamation" type="measure"/>
                 <field name="gravite" type="row"/>
                 <field name="state" type="col"/>
                 <field name="cout_reclamation" type="measure"/>
@@ -145,7 +145,7 @@
         <field name="arch" type="xml">
             <pivot string="Analyse des évaluations">
                 <field name="fournisseur_id"/>
-                <field name="product_category_id"/>
+                <field name="product_category_id" type="measure"/>
                 <field name="state"/>
             </pivot>
         </field>
@@ -243,6 +243,7 @@
         <field name="model">action</field>
         <field name="arch" type="xml">
             <pivot string="Analyse des Actions">
+                <field name="site"/>
                 <field name="type_action"/>
                 <field name="gravite_action"/>
                 <field name="priorite_action"/>

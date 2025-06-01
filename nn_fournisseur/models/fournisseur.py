@@ -30,7 +30,7 @@ class Fournisseur(models.Model):
     # Relations avec les autres modèles
 
     evaluation_ids = fields.One2many('evaluation', 'four_id', string='Évaluations')
-    claim_ids = fields.One2many('reclamation', 'fournisseur_id', string='Réclamations')
+    claim_ids = fields.One2many('reclamation', 'far_id', string='Réclamations')
 
     @api.model
     def create(self, vals):
@@ -47,3 +47,5 @@ class FournisseurCategory(models.Model):
 
     name = fields.Char(string='Nom', required=True)
     description = fields.Text(string='Description')
+
+

@@ -1,4 +1,4 @@
-<!-- views/ai_analysis_views.xml -->
+<!-- nn_evaluation/views/ai_analysis_views.xml -->
 <odoo>
     <!-- Vue formulaire pour l'analyse IA -->
     <record id="view_supplier_ai_analysis_form" model="ir.ui.view">
@@ -20,20 +20,24 @@
                     </div>
 
                     <!-- KPIs de l'analyse -->
-                    <div class="oe_button_box" name="button_box" invisible="state != 'completed'">
-                        <button type="object" class="oe_stat_button" icon="fa-warning">
-                            <field name="risk_score" widget="statinfo" string="Score de Risque"/>
-                        </button>
-                        <button type="object" class="oe_stat_button" icon="fa-check-circle">
-                            <field name="confidence_level" widget="statinfo" string="% Confiance"/>
-                        </button>
-                        <button type="object" class="oe_stat_button" icon="fa-clock-o">
-                            <field name="processing_time" widget="statinfo" string="Temps (s)"/>
-                        </button>
-                        <button type="object" class="oe_stat_button" icon="fa-cogs">
-                            <field name="tokens_used" widget="statinfo" string="Tokens"/>
-                        </button>
-                    </div>
+                  <div class="oe_button_box" name="button_box" invisible="state != 'completed'">
+    <div class="oe_stat_button" role="img" aria-label="Score de Risque" title="Score de Risque">
+        <i class="fa fa-warning o_button_icon"></i>
+        <field name="risk_score" widget="statinfo" string="Score de Risque"/>
+    </div>
+    <div class="oe_stat_button" role="img" aria-label="% Confiance" title="% Confiance">
+        <i class="fa fa-check-circle o_button_icon"></i>
+        <field name="confidence_level" widget="statinfo" string="% Confiance"/>
+    </div>
+    <div class="oe_stat_button" role="img" aria-label="Temps (s)" title="Temps (s)">
+        <i class="fa fa-clock-o o_button_icon"></i>
+        <field name="processing_time" widget="statinfo" string="Temps (s)"/>
+    </div>
+    <div class="oe_stat_button" role="img" aria-label="Tokens" title="Tokens">
+        <i class="fa fa-cogs o_button_icon"></i>
+        <field name="tokens_used" widget="statinfo" string="Tokens"/>
+    </div>
+</div>
 
                     <group>
                         <group>
@@ -182,26 +186,6 @@
         </field>
     </record>
 
-    <!-- Wizard pour analyse en masse -->
-    <record id="view_supplier_bulk_ai_analysis_wizard" model="ir.ui.view">
-        <field name="name">supplier.bulk.ai.analysis.wizard</field>
-        <field name="model">supplier.ai.analysis</field>
-        <field name="arch" type="xml">
-            <form string="Analyse IA en masse">
-                <group>
-                    <field name="analysis_type"/>
-                    <field name="fournisseur_id" string="Fournisseurs" widget="many2many_tags"
-                           help="Laissez vide pour analyser tous les fournisseurs actifs"/>
-                </group>
-                <footer>
-                    <button name="bulk_analyze_suppliers" type="object"
-                            string="Lancer les analyses" class="btn-primary"/>
-                    <button string="Annuler" class="btn-secondary" special="cancel"/>
-                </footer>
-            </form>
-        </field>
-    </record>
-
     <!-- Vue du chatbot IA -->
     <record id="view_supplier_ai_chatbot_form" model="ir.ui.view">
         <field name="name">supplier.ai.chatbot.form</field>
@@ -276,16 +260,24 @@
         </field>
     </record>
 
-    <!-- Extension de la vue évaluation pour intégrer l'IA -->
+    <!-- CORRECTION: Extension de la vue évaluation pour intégrer l'IA -->
     <record id="view_evaluation_form_ai_extended" model="ir.ui.view">
         <field name="name">evaluation.form.ai.extended</field>
         <field name="model">evaluation</field>
-        <field name="inherit_id" ref="nn_evaluation.view_evaluation_form"/>
+        <field name="inherit_id" ref="view_evaluation_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//div[@class='oe_button_box']" position="inside">
+            <xpath expr="//div[@name='button_box']" position="inside">
                 <button type="object" class="oe_stat_button" icon="fa-magic"
                         name="action_generate_ai_insights">
                     <field name="ai_analysis_count" widget="statinfo" string="Analyses IA"/>
+                </button>
+                <button type="object" class="oe_stat_button" icon="fa-eye"
+                        name="action_view_ai_analyses"
+                        invisible="ai_analysis_count == 0">
+                    <div class="o_field_widget o_stat_info">
+                        <span class="o_stat_value">Voir</span>
+                        <span class="o_stat_text">Analyses</span>
+                    </div>
                 </button>
             </xpath>
             <xpath expr="//notebook" position="inside">
@@ -297,6 +289,7 @@
                     <field name="ai_analysis_ids">
                         <tree>
                             <field name="name"/>
+                            <field name="evaluation_id"/>
                             <field name="analysis_type"/>
                             <field name="state"/>
                             <field name="risk_score"/>
@@ -311,44 +304,55 @@
 
     <!-- Configuration OpenAI dans les paramètres -->
     <record id="view_general_configuration_openai" model="ir.ui.view">
-        <field name="name">res.config.settings.openai</field>
-        <field name="model">res.config.settings</field>
-        <field name="inherit_id" ref="base.res_config_settings_view_form"/>
-        <field name="arch" type="xml">
-            <xpath expr="//div[hasclass('settings')]" position="inside">
-                <div class="app_settings_block" data-string="Intelligence Artificielle" string="Intelligence Artificielle" data-key="ai_settings">
-                    <h2>Configuration OpenAI</h2>
-                    <div class="row mt16 o_settings_container">
-                        <div class="col-12 col-lg-6 o_setting_box">
-                            <div class="o_setting_left_pane">
-                                <field name="openai_api_key"/>
-                            </div>
-                            <div class="o_setting_right_pane">
-                                <label for="openai_api_key"/>
-                                <div class="text-muted">
-                                    Clé API OpenAI pour les analyses IA des fournisseurs
-                                </div>
+    <field name="name">res.config.settings.openai</field>
+    <field name="model">res.config.settings</field>
+    <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+    <field name="arch" type="xml">
+        <form position="inside">
+            <div class="app_settings_block" data-string="Intelligence Artificielle" string="Intelligence Artificielle" data-key="ai_settings">
+                <h2>Configuration OpenAI</h2>
+                <div class="row mt16 o_settings_container">
+                    <div class="col-12 col-lg-6 o_setting_box">
+                        <div class="o_setting_left_pane">
+                            <field name="openai_api_key"/>
+                        </div>
+                        <div class="o_setting_right_pane">
+                            <label for="openai_api_key"/>
+                            <div class="text-muted">
+                                Clé API OpenAI pour les analyses IA des fournisseurs
                             </div>
                         </div>
-                        <div class="col-12 col-lg-6 o_setting_box">
-                            <div class="o_setting_left_pane">
-                                <field name="openai_model"/>
+                    </div>
+                    <div class="col-12 col-lg-6 o_setting_box">
+                        <div class="o_setting_left_pane">
+                            <field name="openai_model"/>
+                        </div>
+                        <div class="o_setting_right_pane">
+                            <label for="openai_model"/>
+                            <div class="text-muted">
+                                Modèle OpenAI à utiliser
                             </div>
-                            <div class="o_setting_right_pane">
-                                <label for="openai_model"/>
-                                <div class="text-muted">
-                                    Modèle OpenAI à utiliser
-                                </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-lg-6 o_setting_box">
+                        <div class="o_setting_left_pane">
+                            <field name="ai_simulation_mode"/>
+                        </div>
+                        <div class="o_setting_right_pane">
+                            <label for="ai_simulation_mode"/>
+                            <div class="text-muted">
+                                Utiliser le mode simulation si l'API n'est pas disponible
                             </div>
                         </div>
                     </div>
                 </div>
-            </xpath>
-        </field>
-    </record>
+            </div>
+        </form>
+    </field>
+</record>
 
     <!-- Menus -->
-    <menuitem id="menu_supplier_ai_root" name="IA Fournisseurs" sequence="60"/>
+    <menuitem id="menu_supplier_ai_root" name="IA Fournisseurs" sequence="60" web_icon="fa-brain"/>
 
     <menuitem id="menu_supplier_ai_analysis"
               name="Analyses IA"
@@ -376,5 +380,37 @@
               parent="menu_supplier_ai_root"
               action="action_supplier_ai_analysis_new"
               sequence="5"/>
+
+    <!-- Wizard pour analyse en masse -->
+    <record id="view_bulk_analysis_wizard" model="ir.ui.view">
+        <field name="name">bulk.analysis.wizard</field>
+        <field name="model">supplier.ai.analysis</field>
+        <field name="arch" type="xml">
+            <form string="Analyse IA en masse">
+                <group>
+                    <field name="analysis_type"/>
+                </group>
+                <footer>
+                    <button name="bulk_analyze_suppliers" type="object"
+                            string="Lancer les analyses" class="btn-primary"/>
+                    <button string="Annuler" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_bulk_analysis_wizard" model="ir.actions.act_window">
+        <field name="name">Analyse en masse</field>
+        <field name="res_model">supplier.ai.analysis</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_bulk_analysis_wizard"/>
+        <field name="target">new</field>
+    </record>
+
+    <menuitem id="menu_bulk_analysis"
+              name="Analyse en masse"
+              parent="menu_supplier_ai_root"
+              action="action_bulk_analysis_wizard"
+              sequence="25"/>
 
 </odoo>

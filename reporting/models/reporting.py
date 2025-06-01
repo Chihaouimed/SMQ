@@ -38,6 +38,13 @@ class SMQReportingNonConformity(models.Model):
     demandeur_id = fields.Many2one('hr.employee', string='Demandeur')
     date = fields.Date(string="Date")
 
+    source_non_conformite = fields.Selection([
+        ('interne', 'Interne'),
+        ('client', 'Client'),
+        ('fournisseur', 'Fournisseur'),
+        ('audit', 'Audit')
+    ], string="Source de non conformité")
+
     count = fields.Integer(string='Nombre')
     year = fields.Char(string='Année')
     month = fields.Char(string='Mois')
@@ -46,3 +53,7 @@ class SMQReportingNonConformity(models.Model):
         'product.product',
         string="Produit non conforme"
     )
+
+    type_reclamation = fields.Many2one('type.reclamation', string="Type de réclamation")
+    product_category_id = fields.Many2one('product.category', string='Type de produit')
+    site = fields.Char(string="Site Concerné")

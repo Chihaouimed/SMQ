@@ -8,7 +8,7 @@ class Reclamation(models.Model):
 
     name = fields.Char(string="Code", required=True, copy=False, readonly=True, default="New")
     fournisseur_id = fields.Many2one('res.partner', string='Fournisseur')
-
+    far_id = fields.Char(related='fournisseur_id.name',string='Fournisseur')
     date_reclamation = fields.Date(string='Date de la Réclamation', required=True)
     description = fields.Text(string='Description', required=True)
     type_reclamation = fields.Many2one('type.reclamation', string="Type de réclamation")

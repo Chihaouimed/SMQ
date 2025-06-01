@@ -33,15 +33,13 @@ class NonConformite(models.Model):
         ],
     )
 
-    source_non_conformite = fields.Selection(
-        string="Source de non-conformité",
-        selection=[
-            ('interne', 'Interne'),
-            ('client', 'Client'),
-            ('fournisseur', 'Fournisseur'),
-            ('audit', 'Audit')
-        ],
-    )
+    source_non_conformite = fields.Selection([
+        ('interne', 'Interne'),
+        ('client', 'Client'),
+        ('fournisseur', 'Fournisseur'),
+        ('audit', 'Audit')
+    ], string="Source de non-conformité")
+
 
     niveau_gravite = fields.Selection(
         string="Niveau de gravité",

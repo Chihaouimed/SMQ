@@ -1,3 +1,4 @@
+<!-- nn_evaluation/views/evaluation_views.xml -->
 <odoo>
     <data>
         <!-- Vue Formulaire -->
@@ -7,8 +8,6 @@
             <field name="arch" type="xml">
                 <form string="Évaluation">
                     <header>
-                        <field name="state" widget="statusbar"/>
-
                         <button name="action_pending"
                                 type="object"
                                 string="Passer en attente"
@@ -26,27 +25,66 @@
                                 string="Remettre en brouillon"
                                 class="btn-warning"
                                 invisible="state == 'draft'"/>
+
+                        <field name="state" widget="statusbar"/>
                     </header>
                     <sheet>
+                        <!-- Boutons d'action en haut -->
+                        <div class="oe_button_box" name="button_box">
+                            <!-- Boutons ajoutés par l'extension IA -->
+                        </div>
+
+                        <div class="oe_title">
+                            <h1>
+                                <field name="fournisseur_id" placeholder="Sélectionner un fournisseur..."/>
+                            </h1>
+                        </div>
+
                         <group>
-                            <field name="fournisseur_id"/>  <!-- Correction ici -->
-                            <field name="product_category_id"/>
-                            <field name="periodicity"/>
-                            <field name="state"/>
+                            <group>
+                                <field name="product_category_id"/>
+                                <field name="periodicity"/>
+                                <field name="evaluation_date"/>
+                            </group>
+                            <group>
+                                <field name="total_score" widget="progressbar"/>
+                                <field name="state" readonly="1"/>
+                            </group>
                         </group>
-                        <group>
-                            <field name="evaluation_criteria_ids">
-                                <tree editable="bottom">
-                                    <field name="name"/>
-                                    <field name="score"/>
-                                    <field name="comment"/>
-                                </tree>
-                            </field>
-                        </group>
-                        <group>
-                            <field name="action_ids" widget="many2many_tags"/>
-                        </group>
+
+                        <notebook>
+                            <page string="Critères d'évaluation">
+                                <field name="evaluation_criteria_ids">
+                                    <tree editable="bottom">
+                                        <field name="name"/>
+                                        <field name="score"/>
+                                        <field name="max_score"/>
+                                        <field name="weight"/>
+                                        <field name="comment"/>
+                                    </tree>
+                                </field>
+                            </page>
+
+                            <page string="Actions associées">
+                                <field name="action_ids">
+                                    <tree>
+                                        <field name="name"/>
+                                        <field name="responsible_id"/>
+                                        <field name="deadline"/>
+                                        <field name="priority" widget="badge"/>
+                                        <field name="state" widget="badge"/>
+                                    </tree>
+                                </field>
+                            </page>
+                        </notebook>
                     </sheet>
+
+                    <!-- Chatter pour suivi des modifications -->
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids"/>
+                        <field name="activity_ids"/>
+                        <field name="message_ids"/>
+                    </div>
                 </form>
             </field>
         </record>
@@ -59,26 +97,430 @@
                 <tree string="Évaluations"
                       decoration-info="state == 'draft'"
                       decoration-warning="state == 'pending'"
-                      decoration-success="state == 'validated'">
-                    <field name="fournisseur_id"/>  <!-- Correction ici -->
+                      decoration-success="state == 'validated'"
+                      default_order="create_date desc">
+                    <field name="fournisseur_id"/>
                     <field name="product_category_id"/>
                     <field name="periodicity"/>
-                    <field name="state"/>
+                    <field name="total_score" widget="progressbar"/>
+                    <field name="evaluation_date"/>
+                    <field name="state" widget="badge"/>
+                    <field name="create_date"/>
+                    <button name="action_view_evaluation_result" type="object"
+                            string="📊 Voir Résultat" class="btn-info"
+                            invisible="state == 'draft'"
+                            help="Voir les résultats détaillés de l'évaluation"/>
+
+                    <!-- Vos autres boutons existants -->
+                    <button name="action_pending" type="object" string="En attente"
+                            invisible="state != 'draft'" class="btn-warning"/>
+                    <button name="action_validate" type="object" string="Valider"
+                            invisible="state != 'pending'" class="btn-success"/>
                 </tree>
             </field>
         </record>
 
-        <!-- Action -->
+        <!-- Vue Recherche -->
+        <record id="view_evaluation_search" model="ir.ui.view">
+            <field name="name">evaluation.search</field>
+            <field name="model">evaluation</field>
+            <field name="arch" type="xml">
+                <search string="Rechercher des évaluations">
+                    <field name="fournisseur_id"/>
+                    <field name="product_category_id"/>
+                    <separator/>
+                    <filter string="Brouillons" name="draft" domain="[('state', '=', 'draft')]"/>
+                    <filter string="En attente" name="pending" domain="[('state', '=', 'pending')]"/>
+                    <filter string="Validées" name="validated" domain="[('state', '=', 'validated')]"/>
+                    <separator/>
+                    <filter string="Ce mois" name="this_month"
+                            domain="[('evaluation_date', '&gt;=', (context_today() - relativedelta(months=1)).strftime('%Y-%m-01'))]"/>
+                    <filter string="Ce trimestre" name="this_quarter"
+                            domain="[('evaluation_date', '&gt;=', (context_today() - relativedelta(months=3)).strftime('%Y-%m-01'))]"/>
+                    <group expand="0" string="Regrouper par">
+                        <filter string="Fournisseur" name="group_supplier" context="{'group_by': 'fournisseur_id'}"/>
+                        <filter string="Catégorie" name="group_category" context="{'group_by': 'product_category_id'}"/>
+                        <filter string="État" name="group_state" context="{'group_by': 'state'}"/>
+                        <filter string="Périodicité" name="group_periodicity" context="{'group_by': 'periodicity'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <!-- Vue Kanban -->
+        <record id="view_evaluation_kanban" model="ir.ui.view">
+            <field name="name">evaluation.kanban</field>
+            <field name="model">evaluation</field>
+            <field name="arch" type="xml">
+                <kanban default_group_by="state" class="o_kanban_small_column">
+                    <field name="fournisseur_id"/>
+                    <field name="total_score"/>
+                    <field name="state"/>
+                    <field name="evaluation_date"/>
+                    <templates>
+                        <t t-name="kanban-box">
+                            <div class="oe_kanban_card oe_kanban_global_click">
+                                <div class="oe_kanban_content">
+                                    <div class="o_kanban_record_top">
+                                        <div class="o_kanban_record_headings">
+                                            <strong class="o_kanban_record_title">
+                                                <field name="fournisseur_id"/>
+                                            </strong>
+                                        </div>
+                                        <div class="o_kanban_record_badge">
+                                            <span class="badge badge-info">
+                                                <i class="fa fa-star"/>
+                                                <field name="total_score"/>
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="o_kanban_record_body">
+                                        <field name="product_category_id"/>
+                                        <br/>
+                                        <small>
+                                            <field name="evaluation_date"/>
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                        </t>
+                    </templates>
+                </kanban>
+            </field>
+        </record>
+
+        <!-- Vue Pivot pour analyses -->
+        <record id="view_evaluation_pivot" model="ir.ui.view">
+            <field name="name">evaluation.pivot</field>
+            <field name="model">evaluation</field>
+            <field name="arch" type="xml">
+                <pivot string="Analyses des évaluations">
+                    <field name="fournisseur_id" type="row"/>
+                    <field name="product_category_id" type="col"/>
+                    <field name="total_score" type="measure"/>
+                </pivot>
+            </field>
+        </record>
+
+        <!-- Vue Graphique -->
+        <record id="view_evaluation_graph" model="ir.ui.view">
+            <field name="name">evaluation.graph</field>
+            <field name="model">evaluation</field>
+            <field name="arch" type="xml">
+                <graph string="Évolution des scores d'évaluation" type="line">
+                    <field name="evaluation_date" type="row" interval="month"/>
+                    <field name="total_score" type="measure"/>
+                    <field name="fournisseur_id" type="col"/>
+                </graph>
+            </field>
+        </record>
+
+        <!-- Action principale -->
         <record id="evaluation_action" model="ir.actions.act_window">
             <field name="name">Évaluations</field>
             <field name="res_model">evaluation</field>
-            <field name="view_mode">tree,form</field>
+            <field name="view_mode">kanban,tree,form,pivot,graph</field>
+            <field name="context">{'search_default_this_month': 1}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Aucune évaluation trouvée
+                </p>
+                <p>
+                    Créez votre première évaluation de fournisseur pour commencer à suivre les performances.
+                </p>
+            </field>
         </record>
 
-        <!-- Menu -->
-        <menuitem id="menu_evaluation_root" name="Évaluation" sequence="30"/>
-        <menuitem id="menu_evaluation" name="Gestion des Évaluations" parent="menu_evaluation_root"
-                  action="evaluation_action" sequence="30"/>
+        <!-- Actions rapides -->
+        <record id="evaluation_action_draft" model="ir.actions.act_window">
+            <field name="name">Évaluations en brouillon</field>
+            <field name="res_model">evaluation</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[('state', '=', 'draft')]</field>
+        </record>
+
+        <record id="evaluation_action_pending" model="ir.actions.act_window">
+            <field name="name">Évaluations en attente</field>
+            <field name="res_model">evaluation</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[('state', '=', 'pending')]</field>
+        </record>
+        <!-- Vue des résultats d'évaluation avec vos champs réels -->
+        <!-- Vue des résultats d'évaluation avec vos champs réels -->
+        <record id="view_evaluation_real_result_form" model="ir.ui.view">
+            <field name="name">evaluation.real.result.form</field>
+            <field name="model">evaluation</field>
+            <field name="arch" type="xml">
+                <form string="Résultats d'Évaluation Fournisseur" create="false" edit="false">
+                    <!-- En-tête avec bannière colorée -->
+                    <div class="alert alert-success"
+                         style="background: linear-gradient(135deg, #4CAF50, #2E7D32); color: white; text-align: center; margin: 0; padding: 20px;">
+                        <h2 style="margin: 0; color: white;">
+                            <i class="fa fa-star"/>
+                            Évaluation Complète -
+                            <field name="fournisseur_id" readonly="1"/>
+                        </h2>
+                        <div style="margin-top: 10px;">
+                            <span class="badge badge-light" style="font-size: 14px; margin-right: 10px;">
+                                Score Total:<field name="total_score" readonly="1"/>/10 |
+                                Statut:
+                                <field name="state" readonly="1"/>
+                            </span>
+                            <span style="font-size: 14px;">
+                                <field name="evaluation_date" readonly="1"/>
+                            </span>
+                        </div>
+                    </div>
+
+                    <sheet style="padding: 0;">
+                        <!-- Section Informations Générales -->
+                        <div class="mt-4">
+                            <div style="border-left: 4px solid #2196F3; padding-left: 15px; margin-bottom: 20px;">
+                                <h3 style="color: #1565C0; margin-bottom: 15px;">
+                                    <i class="fa fa-info-circle"/>
+                                    1. Informations Générales
+                                </h3>
+
+                                <div class="card" style="border: 1px solid #e3f2fd; margin-bottom: 15px;">
+                                    <div class="card-body" style="padding: 15px; background: #f3f9ff;">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                                                    <i class="fa fa-building"
+                                                       style="color: #2196F3; margin-right: 10px;"/>
+                                                    <div>
+                                                        <strong>Fournisseur :</strong>
+                                                        <br/>
+                                                        <field name="fournisseur_id" readonly="1" nolabel="1"/>
+                                                    </div>
+                                                </div>
+
+                                                <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                                                    <i class="fa fa-tag" style="color: #2196F3; margin-right: 10px;"/>
+                                                    <div>
+                                                        <strong>Catégorie de Produit :</strong>
+                                                        <br/>
+                                                        <field name="product_category_id" readonly="1" nolabel="1"/>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-6">
+                                                <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                                                    <i class="fa fa-calendar"
+                                                       style="color: #2196F3; margin-right: 10px;"/>
+                                                    <div>
+                                                        <strong>Date d'Évaluation :</strong>
+                                                        <br/>
+                                                        <field name="evaluation_date" readonly="1" nolabel="1"/>
+                                                    </div>
+                                                </div>
+
+                                                <div style="display: flex; align-items: center;">
+                                                    <i class="fa fa-clock-o"
+                                                       style="color: #2196F3; margin-right: 10px;"/>
+                                                    <div>
+                                                        <strong>Périodicité :</strong>
+                                                        <br/>
+                                                        <field name="periodicity" readonly="1" nolabel="1"/>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Section Score Global et Performance -->
+                        <div class="mt-4">
+                            <div style="border-left: 4px solid #4CAF50; padding-left: 15px; margin-bottom: 20px;">
+                                <h3 style="color: #2E7D32; margin-bottom: 15px;">
+                                    <i class="fa fa-trophy"/>
+                                    2. Performance Globale
+                                </h3>
+
+                                <div class="card" style="border: 1px solid #c8e6c9; margin-bottom: 15px;">
+                                    <div class="card-header" style="background: #e8f5e8; padding: 10px 15px;">
+                                        <strong>Score Total :
+                                            <field name="total_score" readonly="1" nolabel="1"/>
+                                            / 10
+                                        </strong>
+                                    </div>
+                                    <div class="card-body" style="padding: 15px;">
+                                        <!-- Barre de progression du score total -->
+                                        <div style="margin-bottom: 20px;">
+                                            <field name="total_score" widget="progressbar" readonly="1" nolabel="1"/>
+                                        </div>
+
+                                        <!-- Évaluation qualitative -->
+                                        <div style="text-align: center; color: #2E7D32; font-weight: bold; font-size: 18px;">
+                                            <i class="fa fa-star"/>
+                                            SCORE:
+                                            <field name="total_score" readonly="1" nolabel="1"/>
+                                            / 10
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Section Détail des Critères -->
+                        <group string="📊 Performance Globale">
+                            <field name="total_score" widget="progressbar" string="Score Total (/10)"/>
+                        </group>
+
+                        <!-- Section Actions Associées -->
+                        <div class="mt-4" invisible="not action_ids">
+                            <div style="border-left: 4px solid #9C27B0; padding-left: 15px; margin-bottom: 20px;">
+                                <h3 style="color: #7B1FA2; margin-bottom: 15px;">
+                                    <i class="fa fa-tasks"/>
+                                    4. Actions Associées
+                                </h3>
+
+                                <div class="card" style="border: 1px solid #e1bee7;">
+                                    <div class="card-body" style="padding: 15px; background: #fce4ec;">
+                                        <field name="action_ids" readonly="1" nolabel="1">
+                                            <tree create="false" edit="false">
+                                                <field name="name" string="Action"/>
+                                                <field name="responsible_id" string="Responsable"/>
+                                                <field name="deadline" string="Échéance"/>
+                                                <field name="priority" string="Priorité"/>
+                                                <field name="state" string="État"/>
+                                            </tree>
+                                        </field>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Section Recommandations Automatiques -->
+                        <div class="mt-4">
+                            <div style="border-left: 4px solid #00BCD4; padding-left: 15px; margin-bottom: 20px;">
+                                <h3 style="color: #00838F; margin-bottom: 15px;">
+                                    <i class="fa fa-lightbulb-o"/>
+                                    5. Recommandations Automatiques
+                                </h3>
+
+                                <div class="card" style="border: 1px solid #b2ebf2;">
+                                    <div class="card-body" style="padding: 15px; background: #e0f2f1;">
+                                        <!-- Recommandations générales -->
+                                        <div style="display: flex; align-items: flex-start; margin-bottom: 15px;">
+                                            <i class="fa fa-lightbulb-o"
+                                               style="color: #00BCD4; margin-right: 10px; margin-top: 3px;"/>
+                                            <div>
+                                                <strong>Suivi Recommandé :</strong>
+                                                <br/>
+                                                <span style="color: #00838F;">Maintenir un suivi régulier des
+                                                    performances de ce fournisseur
+                                                </span>
+                                            </div>
+                                        </div>
+
+                                        <div style="display: flex; align-items: flex-start; margin-bottom: 15px;">
+                                            <i class="fa fa-handshake-o"
+                                               style="color: #00BCD4; margin-right: 10px; margin-top: 3px;"/>
+                                            <div>
+                                                <strong>Communication :</strong>
+                                                <br/>
+                                                <span style="color: #00838F;">Partager les résultats avec le fournisseur
+                                                    pour renforcer la collaboration
+                                                </span>
+                                            </div>
+                                        </div>
+
+                                        <div style="display: flex; align-items: flex-start;">
+                                            <i class="fa fa-bar-chart"
+                                               style="color: #00BCD4; margin-right: 10px; margin-top: 3px;"/>
+                                            <div>
+                                                <strong>Amélioration Continue :</strong>
+                                                <br/>
+                                                <span style="color: #00838F;">Identifier les opportunités d'amélioration
+                                                    mutuelle
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Section Prochaines Étapes -->
+                        <div class="mt-4 mb-4">
+                            <div style="border-left: 4px solid #607D8B; padding-left: 15px;">
+                                <h3 style="color: #455A64; margin-bottom: 15px;">
+                                    <i class="fa fa-calendar-check-o"/>
+                                    6. Prochaines Étapes
+                                </h3>
+
+                                <div class="card" style="border: 1px solid #cfd8dc;">
+                                    <div class="card-body" style="padding: 15px; background: #f5f5f5;">
+                                        <div style="display: flex; align-items: flex-start; margin-bottom: 10px;">
+                                            <span class="badge badge-primary"
+                                                  style="margin-right: 10px; margin-top: 3px;">Immédiat
+                                            </span>
+                                            <span>Partager ces résultats avec le fournisseur</span>
+                                        </div>
+
+                                        <div style="display: flex; align-items: flex-start; margin-bottom: 10px;">
+                                            <span class="badge badge-info" style="margin-right: 10px; margin-top: 3px;">
+                                                30 jours
+                                            </span>
+                                            <span>Suivre la mise en œuvre des actions correctives</span>
+                                        </div>
+
+                                        <div style="display: flex; align-items: flex-start;">
+                                            <span class="badge badge-success"
+                                                  style="margin-right: 10px; margin-top: 3px;">
+                                                Prochaine évaluation
+                                            </span>
+                                            <span>Programmer selon la périodicité définie:
+                                                <field name="periodicity" readonly="1" nolabel="1"/>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!-- Action pour ouvrir cette vue -->
+        <record id="action_evaluation_real_result_view" model="ir.actions.act_window">
+            <field name="name">Résultat d'Évaluation</field>
+            <field name="res_model">evaluation</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_evaluation_real_result_form"/>
+            <field name="target">current</field>
+        </record>
+
+
+        <!-- Menus -->
+        <menuitem id="menu_evaluation_root"
+                  name="Évaluation Fournisseurs"
+                  sequence="30"
+                  web_icon="fa-star"/>
+
+        <menuitem id="menu_evaluation"
+                  name="Gestion des Évaluations"
+                  parent="menu_evaluation_root"
+                  action="evaluation_action"
+                  sequence="10"/>
+
+        <menuitem id="menu_evaluation_draft"
+                  name="Brouillons"
+                  parent="menu_evaluation_root"
+                  action="evaluation_action_draft"
+                  sequence="20"/>
+
+        <menuitem id="menu_evaluation_pending"
+                  name="En attente"
+                  parent="menu_evaluation_root"
+                  action="evaluation_action_pending"
+                  sequence="30"/>
 
     </data>
 </odoo>
