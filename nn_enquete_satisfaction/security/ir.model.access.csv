@@ -1,2 +1,5 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_enquete_satisfaction_user,enquete.satisfaction user,model_enquete_satisfaction,,1,1,1,1
+access_enquete_satisfaction_manager,enquete.satisfaction.manager,model_enquete_satisfaction,base.group_system,1,1,1,1
+access_satisfaction_report_wizard_user,satisfaction.report.wizard.user,model_satisfaction_report_wizard,base.group_user,1,1,1,1
+access_satisfaction_report_wizard_manager,satisfaction.report.wizard.manager,model_satisfaction_report_wizard,base.group_system,1,1,1,1

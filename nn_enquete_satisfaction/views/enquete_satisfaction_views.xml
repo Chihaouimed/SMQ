@@ -1,56 +1,291 @@
+<?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- Définir l'action avant de l'utiliser dans le menu -->
+
+    <!-- Vue formulaire principale avec IA intégrée -->
+    <record id="view_enquete_satisfaction_form" model="ir.ui.view">
+        <field name="name">enquete.satisfaction.form</field>
+        <field name="model">enquete.satisfaction</field>
+        <field name="arch" type="xml">
+            <form string="Enquête de Satisfaction avec IA">
+                <header>
+                    <button name="action_send_emails" type="object" string="Envoyer un mail" class="btn-primary"/>
+                    <button name="action_analyze_satisfaction"
+                            string="🤖 Analyser Satisfaction"
+                            type="object"
+                            class="btn-success"
+                            help="Analyser la satisfaction avec l'IA"/>
+                    <button name="action_generate_satisfaction_report"
+                            string="📊 Rapport"
+                            type="object"
+                            class="btn-info"
+                            invisible="not analysis_completed"
+                            help="Générer le rapport de satisfaction"/>
+                </header>
+
+                <sheet>
+                    <!-- Champs de base -->
+                    <group>
+                        <group>
+                            <field name="reference"/>
+                            <field name="date_debut"/>
+                            <field name="date_fin"/>
+                        </group>
+                        <group>
+                            <field name="type_questionnaire"/>
+                            <field name="survey_id"/>
+                            <field name="responsible_id"/>
+                        </group>
+                    </group>
+
+                    <group>
+                        <field name="client_ids" widget="many2many_tags"/>
+                    </group>
+
+                    <!-- Section IA de satisfaction -->
+                    <div class="ia-satisfaction-section" style="margin-top: 20px;">
+
+                        <!-- Message si IA non configurée -->
+                        <div class="alert alert-warning" role="alert" invisible="ia_configured">
+                            <h5><i class="fa fa-robot mr-2"></i>Intelligence Artificielle non configurée</h5>
+                            <p>Configurez l'IA pour analyser automatiquement la satisfaction de vos clients.</p>
+                            <p><strong>Instructions :</strong></p>
+                            <ol>
+                                <li>Obtenez une clé API gratuite sur <a href="https://huggingface.co/settings/tokens" target="_blank">huggingface.co</a></li>
+                                <li>Allez dans Paramètres → Technique → Paramètres système</li>
+                                <li>Créez un paramètre: <code>huggingface.api_key</code> avec votre clé</li>
+                            </ol>
+                        </div>
+
+                        <!-- Résultats d'analyse IA -->
+                        <div class="ia-results" invisible="not analysis_completed">
+
+                            <!-- En-tête avec score principal -->
+                            <div style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%); color: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; text-align: center;">
+                                <h2><i class="fa fa-smile-o mr-2"></i>Analyse de Satisfaction IA</h2>
+                                <div style="font-size: 3em; margin: 10px 0;">
+                                    <field name="satisfaction_score" widget="percentage" nolabel="1"/>
+                                </div>
+                                <div style="font-size: 1.2em;">
+                                    Niveau: <field name="satisfaction_level" nolabel="1"/>
+                                </div>
+                            </div>
+
+                            <!-- Tableau de bord des métriques -->
+                            <div class="row mb-4">
+                                <div class="col-md-3">
+                                    <div class="card text-center border-success">
+                                        <div class="card-body">
+                                            <h5 class="card-title text-success">😊 Positif</h5>
+                                            <h2 class="text-success"><field name="positive_responses"/></h2>
+                                            <small class="text-muted">réponses</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="card text-center border-danger">
+                                        <div class="card-body">
+                                            <h5 class="card-title text-danger">😞 Négatif</h5>
+                                            <h2 class="text-danger"><field name="negative_responses"/></h2>
+                                            <small class="text-muted">réponses</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="card text-center border-secondary">
+                                        <div class="card-body">
+                                            <h5 class="card-title text-secondary">😐 Neutre</h5>
+                                            <h2 class="text-secondary"><field name="neutral_responses"/></h2>
+                                            <small class="text-muted">réponses</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="card text-center border-primary">
+                                        <div class="card-body">
+                                            <h5 class="card-title text-primary">📊 Total</h5>
+                                            <h2 class="text-primary"><field name="response_count"/></h2>
+                                            <small class="text-muted">réponses</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Résumé et recommandations -->
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="card h-100">
+                                        <div class="card-header bg-info text-white">
+                                            <h6 class="mb-0"><i class="fa fa-chart-line mr-2"></i>Résumé de l'Analyse</h6>
+                                        </div>
+                                        <div class="card-body">
+                                            <field name="satisfaction_summary" readonly="1" nolabel="1" widget="text"/>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="card h-100">
+                                        <div class="card-header bg-warning text-dark">
+                                            <h6 class="mb-0"><i class="fa fa-lightbulb-o mr-2"></i>Actions Recommandées</h6>
+                                        </div>
+                                        <div class="card-body">
+                                            <field name="recommended_actions" readonly="1" nolabel="1" widget="text"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Points positifs et négatifs -->
+                            <div class="row mt-4" invisible="not positive_points and not negative_points">
+                                <div class="col-md-6">
+                                    <div class="card border-success">
+                                        <div class="card-header bg-success text-white">
+                                            <h6 class="mb-0"><i class="fa fa-thumbs-up mr-2"></i>Points Positifs</h6>
+                                        </div>
+                                        <div class="card-body">
+                                            <field name="positive_points" readonly="1" nolabel="1" widget="text"/>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="card border-warning">
+                                        <div class="card-header bg-warning text-dark">
+                                            <h6 class="mb-0"><i class="fa fa-exclamation-triangle mr-2"></i>Points d'Amélioration</h6>
+                                        </div>
+                                        <div class="card-body">
+                                            <field name="negative_points" readonly="1" nolabel="1" widget="text"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Actions rapides -->
+                            <div class="text-center mt-4">
+                                <button name="action_analyze_satisfaction"
+                                        string="🔄 Re-analyser"
+                                        type="object"
+                                        class="btn btn-outline-primary mr-2"/>
+
+                                <button name="action_generate_satisfaction_report"
+                                        string="📄 Rapport Complet"
+                                        type="object"
+                                        class="btn btn-outline-info"/>
+                            </div>
+
+                            <!-- Info analyse -->
+                            <div class="mt-3 text-center text-muted">
+                                <small>
+                                    <i class="fa fa-clock-o mr-1"></i>
+                                    Dernière analyse: <field name="analysis_date" readonly="1" nolabel="1"/>
+                                </small>
+                            </div>
+                        </div>
+
+                        <!-- Message pour lancer l'analyse -->
+                        <div class="text-center p-5" invisible="analysis_completed or not survey_id">
+                            <div class="alert alert-light border">
+                                <h3><i class="fa fa-robot mr-2"></i>Analyse IA de Satisfaction</h3>
+                                <p class="lead">Découvrez automatiquement le niveau de satisfaction de vos clients grâce à l'intelligence artificielle.</p>
+                                <hr/>
+                                <button name="action_analyze_satisfaction"
+                                        string="🤖 Lancer l'Analyse de Satisfaction"
+                                        type="object"
+                                        class="btn btn-success btn-lg"
+                                        invisible="not ia_configured"/>
+                                <div invisible="ia_configured">
+                                    <p class="text-muted">Configurez d'abord l'IA avec votre clé API Hugging Face</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Champs cachés pour les calculs -->
+                        <field name="ia_configured" invisible="1"/>
+                        <field name="analysis_completed" invisible="1"/>
+                    </div>
+                </sheet>
+
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- Vue liste UNIQUE et simplifiée -->
+    <record id="view_enquete_satisfaction_tree" model="ir.ui.view">
+        <field name="name">enquete.satisfaction.tree</field>
+        <field name="model">enquete.satisfaction</field>
+        <field name="arch" type="xml">
+            <tree string="Enquêtes de Satisfaction"
+                  decoration-success="satisfaction_score &gt; 0.7"
+                  decoration-warning="satisfaction_score &gt; 0.4 and satisfaction_score &lt;= 0.7"
+                  decoration-danger="satisfaction_score &lt;= 0.4 and satisfaction_score &gt; 0">
+
+                <field name="reference"/>
+                <field name="date_debut"/>
+                <field name="date_fin"/>
+                <field name="type_questionnaire"/>
+                <field name="state"/>
+                <field name="response_count" string="Réponses"/>
+                <field name="satisfaction_score" string="Satisfaction %" widget="percentage" optional="show"/>
+                <field name="satisfaction_level" string="Niveau" optional="show"/>
+                <field name="analysis_completed" invisible="1"/>
+
+                <button name="action_analyze_satisfaction"
+                        string="🤖"
+                        type="object"
+                        title="Analyser avec IA"
+                        invisible="analysis_completed"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Action principale UNIQUE -->
+    <record id="action_enquete_satisfaction" model="ir.actions.act_window">
+        <field name="name">Enquêtes de Satisfaction IA</field>
+        <field name="res_model">enquete.satisfaction</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Créez votre première enquête avec analyse IA !
+            </p>
+            <p>
+                🤖 <strong>Intelligence Artificielle intégrée</strong><br/>
+                • Analyse automatique des sentiments<br/>
+                • Score de satisfaction global<br/>
+                • Recommandations personnalisées<br/>
+                • Rapports détaillés
+            </p>
+        </field>
+    </record>
+
+    <!-- Action pour formulaire -->
     <record id="action_enquete_satisfaction_form" model="ir.actions.act_window">
-        <field name="name">Formulaire Enquête de Satisfaction</field>
+        <field name="name">Nouvelle Enquête de Satisfaction</field>
         <field name="res_model">enquete.satisfaction</field>
         <field name="view_mode">form</field>
         <field name="target">current</field>
     </record>
 
-    <!-- Vue de formulaire pour l'enquête de satisfaction -->
-    <record id="view_enquete_satisfaction_form" model="ir.ui.view">
-        <field name="name">enquete.satisfaction.form</field>
-        <field name="model">enquete.satisfaction</field>
-        <field name="arch" type="xml">
-            <form string="Enquête de Satisfaction">
-                <header>
-                    <button name="action_send_emails" type="object" string="Envoyer un mail"/>
+    <!-- STRUCTURE DE MENUS SIMPLIFIÉE -->
 
-                </header>
-                <sheet>
+    <!-- Menu racine -->
+    <menuitem id="menu_enquete_satisfaction_root"
+              name="Enquêtes Satisfaction IA"
+              sequence="10"
+              web_icon="fa-smile-o"/>
 
-                    <group>
-                        <field name="reference"/>
-                        <field name="date_debut"/>
-                        <field name="date_fin"/>
-                        <field name="type_questionnaire"/>
-                        <field name="survey_id"/>
-                        <field name="client_ids" widget="Many2many_tags"/>
-                    </group>
+    <!-- Sous-menus -->
+    <menuitem id="menu_enquete_satisfaction_list"
+              name="Toutes les Enquêtes"
+              parent="menu_enquete_satisfaction_root"
+              action="action_enquete_satisfaction"
+              sequence="10"/>
 
-                </sheet>
-            </form>
-        </field>
-    </record>
+    <menuitem id="menu_enquete_satisfaction_new"
+              name="Nouvelle Enquête"
+              parent="menu_enquete_satisfaction_root"
+              action="action_enquete_satisfaction_form"
+              sequence="20"/>
 
-    <!-- Menu principal "Enquêtes de Satisfaction" -->
-    <menuitem id="menu_enquete_satisfaction" name="Enquêtes de Satisfaction" sequence="10"/>
-    <record id="enquete_satisfaction_action" model="ir.actions.act_window">
-        <field name="name">Enquêtes de Satisfaction</field>
-        <field name="res_model">enquete.satisfaction</field>
-        <field name="view_mode">tree,form,pivot,graph</field>
-        <!-- Décommente la ligne ci-dessous si tu as défini une vue de recherche spécifique -->
-        <!-- <field name="search_view_id" ref="module_name.view_enquete_satisfaction_search"/> -->
-        <field name="help" type="html">
-            <p class="o_view_nocontent_smiling_face">
-                Lancez votre première enquête de satisfaction !
-            </p>
-            <p>
-                Les enquêtes de satisfaction vous permettent de recueillir des retours clients pour améliorer vos
-                produits
-                et services.
-            </p>
-        </field>
-    </record>
 </odoo>
-

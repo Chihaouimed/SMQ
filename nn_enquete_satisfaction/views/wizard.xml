@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Vue formulaire pour le rapport de satisfaction -->
+    <record id="satisfaction_report_wizard_form" model="ir.ui.view">
+        <field name="name">satisfaction.report.wizard.form</field>
+        <field name="model">satisfaction.report.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Rapport d'Analyse de Satisfaction IA">
+                <!-- En-tête avec les métriques clés -->
+                <div class="oe_title"
+                     style="padding: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; margin-bottom: 20px;">
+                    <h1 style="margin: 0; color: white;">
+                        <field name="enquete_id" readonly="1" style="color: white; font-weight: bold;"/>
+                    </h1>
+                    <h2 style="margin: 10px 0 0 0; color: #f8f9fa;">
+                        📊 Rapport d'Analyse de Satisfaction IA
+                    </h2>
+                </div>
+
+                <!-- Métriques principales -->
+                <div style="display: flex; justify-content: space-around; margin-bottom: 30px;">
+                    <div style="text-align: center; padding: 15px; background: #28a745; color: white; border-radius: 10px; min-width: 120px;">
+                        <div style="font-size: 28px; font-weight: bold;">
+                            <field name="satisfaction_score" widget="percentage" readonly="1"/>
+                        </div>
+                        <div style="font-size: 14px;">Score Global</div>
+                    </div>
+
+                    <div style="text-align: center; padding: 15px; background: #007bff; color: white; border-radius: 10px; min-width: 120px;">
+                        <div style="font-size: 28px; font-weight: bold;">
+                            <field name="response_count" readonly="1"/>
+                        </div>
+                        <div style="font-size: 14px;">Réponses</div>
+                    </div>
+
+                    <div style="text-align: center; padding: 15px; background: #17a2b8; color: white; border-radius: 10px; min-width: 120px;">
+                        <div style="font-size: 28px; font-weight: bold;">
+                            <field name="response_rate" widget="percentage" readonly="1"/>
+                        </div>
+                        <div style="font-size: 14px;">Taux de Réponse</div>
+                    </div>
+
+                    <div style="text-align: center; padding: 15px; background: #6f42c1; color: white; border-radius: 10px; min-width: 120px;">
+                        <div style="font-size: 18px; font-weight: bold;">
+                            <field name="satisfaction_level" readonly="1"/>
+                        </div>
+                        <div style="font-size: 14px;">Niveau</div>
+                    </div>
+                </div>
+
+                <!-- Répartition des sentiments -->
+                <group string="📈 Répartition des Sentiments" style="margin-bottom: 20px;">
+                    <div style="display: flex; justify-content: space-around;">
+                        <div style="text-align: center;">
+                            <div style="color: #28a745; font-size: 24px; font-weight: bold;">
+                                <field name="positive_responses" readonly="1"/>
+                            </div>
+                            <div style="color: #28a745;">✅ Positives</div>
+                        </div>
+                        <div style="text-align: center;">
+                            <div style="color: #dc3545; font-size: 24px; font-weight: bold;">
+                                <field name="negative_responses" readonly="1"/>
+                            </div>
+                            <div style="color: #dc3545;">❌ Négatives</div>
+                        </div>
+                        <div style="text-align: center;">
+                            <div style="color: #6c757d; font-size: 24px; font-weight: bold;">
+                                <field name="neutral_responses" readonly="1"/>
+                            </div>
+                            <div style="color: #6c757d;">➖ Neutres</div>
+                        </div>
+                    </div>
+                </group>
+
+                <!-- Contenu principal du rapport -->
+                <notebook>
+                    <page string="📊 Résumé Exécutif" name="summary">
+                        <field name="satisfaction_summary" widget="html" readonly="1"
+                               options="{'style-inline': true}" nolabel="1"/>
+                    </page>
+
+                    <page string="🌟 Points Positifs" name="positive">
+                        <field name="positive_points" widget="html" readonly="1"
+                               options="{'style-inline': true}" nolabel="1"/>
+                    </page>
+
+                    <page string="🔧 Points d'Amélioration" name="negative">
+                        <field name="negative_points" widget="html" readonly="1"
+                               options="{'style-inline': true}" nolabel="1"/>
+                    </page>
+
+                    <page string="💡 Recommandations IA" name="recommendations">
+                        <field name="recommended_actions" widget="html" readonly="1"
+                               options="{'style-inline': true}" nolabel="1"/>
+                    </page>
+
+                    <page string="📋 Analyse par Question" name="questions">
+                        <field name="question_analysis" widget="html" readonly="1"
+                               options="{'style-inline': true}" nolabel="1"/>
+                    </page>
+
+                    <page string="ℹ️ Informations" name="info">
+                        <group>
+                            <group string="Détails de l'Enquête">
+                                <field name="enquete_id" readonly="1"/>
+                                <field name="total_clients" readonly="1"/>
+                                <field name="response_count" readonly="1"/>
+                                <field name="response_rate" widget="percentage" readonly="1"/>
+                            </group>
+                            <group string="Analyse">
+                                <field name="analysis_date" readonly="1"/>
+                                <field name="satisfaction_score" widget="percentage" readonly="1"/>
+                                <field name="satisfaction_level" readonly="1"/>
+                            </group>
+                        </group>
+                    </page>
+                </notebook>
+
+                <!-- Boutons d'action -->
+                <footer>
+                    <div style="text-align: center; margin-top: 20px;">
+                        <button name="action_send_report_by_email" string="📧 Envoyer par Email"
+                                type="object" class="btn-primary" style="margin-right: 10px;"/>
+                        <button name="action_back_to_survey" string="↩️ Retour à l'Enquête"
+                                type="object" class="btn-secondary" style="margin-right: 10px;"/>
+                        <button string="❌ Fermer" special="cancel" class="btn-secondary"/>
+                    </div>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- Action pour ouvrir le wizard -->
+    <record id="action_satisfaction_report_wizard" model="ir.actions.act_window">
+        <field name="name">Rapport d'Analyse de Satisfaction</field>
+        <field name="res_model">satisfaction.report.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="context">{}</field>
+    </record>
+
+</odoo>
